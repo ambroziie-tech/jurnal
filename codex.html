@@ -1,0 +1,3878 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Codex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-2: #fafafa;
+    --bg-3: #f4f4f4;
+    --ink: #0a0a0a;
+    --ink-2: #404040;
+    --ink-3: #737373;
+    --ink-4: #a3a3a3;
+    --line: #e5e5e5;
+    --line-2: #d4d4d4;
+    --accent: #0a0a0a;
+    --ok: #16a34a;
+    --warn: #dc2626;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Manrope', -apple-system, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  body { min-height: 100vh; padding-bottom: 100px; }
+  
+  .mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: "ss02"; }
+
+  /* HEADER */
+  header {
+    padding: 24px 20px 16px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid var(--line);
+  }
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+  header .logo {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  header .day-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+  }
+  header .date {
+    font-size: 13px;
+    color: var(--ink-3);
+    font-weight: 400;
+  }
+
+  /* TAB BAR (BOTTOM) */
+  .tabbar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 8px 4px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 50;
+  }
+  .tabbar button {
+    background: none;
+    border: none;
+    padding: 8px 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--ink-4);
+    transition: color 0.15s;
+    position: relative;
+    border-radius: 8px;
+  }
+  .tabbar button.active { color: var(--ink); }
+  .tabbar button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+  .tabbar svg { width: 22px; height: 22px; stroke-width: 1.8; }
+  .tabbar .label {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  /* MORE MENU */
+  .more-menu-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 60;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .more-menu-bg.show { display: flex; animation: mbgin 0.2s ease; }
+  .more-menu {
+    background: var(--bg);
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px 20px 0 0;
+    padding: 16px 16px 24px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    animation: min 0.25s ease;
+  }
+  .more-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .more-item {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 8px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--bg);
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .more-item:active { background: var(--bg-2); transform: scale(0.97); }
+  .more-item svg { width: 22px; height: 22px; stroke-width: 1.8; color: var(--ink); }
+  .more-item .more-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .more-item .more-desc {
+    font-size: 10px;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+  }
+  .more-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-align: center;
+    color: var(--ink);
+  }
+
+  /* MAIN */
+  main {
+    padding: 20px 20px 40px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: in 0.25s ease; }
+  @keyframes in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTION HEADER */
+  .section-head {
+    margin-bottom: 24px;
+  }
+  .section-head .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-4);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .section-head h2 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .section-head .desc {
+    font-size: 13px;
+    color: var(--ink-3);
+    max-width: 80%;
+  }
+
+  /* BLOCK (replaces card) */
+  .block {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    background: var(--bg);
+  }
+  .block.tight { padding: 14px 16px; }
+  .block.dark {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+  .block.dark .b-label { color: var(--ink-4); }
+  .block.dark .b-title { color: var(--bg); }
+
+  .b-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-4);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .b-label .dot {
+    width: 5px;
+    height: 5px;
+    background: var(--ink);
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .b-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin-bottom: 6px;
+    line-height: 1.25;
+  }
+  .b-sub {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+  }
+  .b-source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-4);
+    letter-spacing: 0.05em;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    text-transform: uppercase;
+  }
+
+  /* QUOTE */
+  .pull-quote {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: var(--ink);
+    padding: 4px 0;
+  }
+  .pull-quote .author {
+    display: block;
+    margin-top: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-4);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* FORM */
+  label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+    margin-top: 12px;
+  }
+  label:first-child { margin-top: 0; }
+  input[type="text"], input[type="number"], textarea, select {
+    width: 100%;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    transition: all 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--ink);
+    background: var(--bg);
+  }
+  textarea {
+    resize: none;
+    min-height: 72px;
+    line-height: 1.45;
+  }
+  select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  /* BUTTONS */
+  button.btn {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 13px 18px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: -0.005em;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  button.btn:active { transform: scale(0.98); }
+  button.btn.outline {
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line-2);
+  }
+  button.btn.full { width: 100%; }
+  button.btn.small { padding: 8px 12px; font-size: 12px; }
+  button.btn.icon {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+  }
+
+  /* HABIT */
+  .habit-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .habit-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .habit-check {
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid var(--ink-4);
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    transition: all 0.15s;
+  }
+  .habit-check.done {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .habit-check.done::after {
+    content: '';
+    width: 10px;
+    height: 6px;
+    border-left: 2px solid var(--bg);
+    border-bottom: 2px solid var(--bg);
+    transform: rotate(-45deg) translate(1px, -1px);
+  }
+  .habit-info { flex: 1; min-width: 0; }
+  .habit-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .habit-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-4);
+    letter-spacing: 0.04em;
+    margin-top: 3px;
+    display: flex;
+    gap: 12px;
+  }
+  .habit-meta .streak-num {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .habit-del {
+    background: none;
+    border: none;
+    color: var(--ink-4);
+    cursor: pointer;
+    padding: 6px;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  /* STATS */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .stat {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .stat .v {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .stat .l {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-4);
+    margin-top: 6px;
+  }
+
+  /* TIMER */
+  .timer-wrap {
+    text-align: center;
+    padding: 8px 0 16px;
+  }
+  .timer-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 72px;
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    margin: 16px 0;
+  }
+  .timer-ring {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+  }
+  .timer-ring svg {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+  }
+  .timer-ring .bg { stroke: var(--line); }
+  .timer-ring .fg { 
+    stroke: var(--ink); 
+    transition: stroke-dashoffset 0.5s;
+  }
+  .timer-ring .center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 36px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-presets {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .timer-presets button {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    padding: 8px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .timer-presets button.active {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+  .timer-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  /* MONEY ROW */
+  .m-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .m-row:last-child { border-bottom: none; }
+  .m-row .lbl {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  .m-row .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .m-row.total { 
+    border-top: 2px solid var(--ink); 
+    border-bottom: none; 
+    padding-top: 13px;
+    margin-top: 4px;
+  }
+  .m-row.total .val { 
+    font-size: 18px; 
+    font-weight: 700;
+  }
+  .val.pos { color: var(--ok); }
+  .val.neg { color: var(--warn); }
+
+  /* PROGRESS */
+  .progress {
+    background: var(--bg-3);
+    border-radius: 100px;
+    height: 6px;
+    overflow: hidden;
+    margin: 10px 0;
+  }
+  .progress > div {
+    background: var(--ink);
+    height: 100%;
+    transition: width 0.5s;
+  }
+
+  /* DECISIONS */
+  .pro-con {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .pc-col {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .pc-col h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .pc-col.pro h4 { color: var(--ok); }
+  .pc-col.con h4 { color: var(--warn); }
+  .pc-col textarea { background: transparent; border: none; padding: 0; min-height: 60px; font-size: 13px; }
+
+  /* WISDOM */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    color: var(--ink-4);
+    pointer-events: none;
+  }
+  .search-wrap input {
+    padding-left: 38px;
+  }
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin-bottom: 14px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-row button {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--ink-3);
+    padding: 7px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .filter-row button.active {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+  .w-item {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    background: var(--bg);
+    transition: all 0.15s;
+  }
+  .w-item:active { background: var(--bg-2); }
+  .w-item .w-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .w-item .w-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-4);
+    letter-spacing: 0.05em;
+  }
+  .w-item .w-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-4);
+    background: var(--bg-3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .w-item .w-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .w-item .w-body {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .w-item.open .w-body { display: block; }
+  .w-item .w-src {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-4);
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* JOURNAL */
+  .j-entry {
+    border-left: 2px solid var(--ink);
+    padding: 12px 0 12px 14px;
+    margin-bottom: 14px;
+  }
+  .j-entry .j-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .j-entry .j-line {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+  .j-entry .j-line b {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* RESULT BOX */
+  .result {
+    margin-top: 14px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg-2);
+  }
+  .result .r-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    margin-bottom: 8px;
+  }
+  .result .r-big {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-bottom: 4px;
+  }
+  .result .r-small {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  /* MATRIX */
+  .matrix {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .mtx-cell {
+    border: 1px solid var(--line);
+    padding: 12px;
+    border-radius: 8px;
+    min-height: 80px;
+  }
+  .mtx-cell.q1 { border-color: var(--ink); background: var(--bg-2); }
+  .mtx-cell .mtx-l {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+  .mtx-cell .mtx-t {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .mtx-cell .mtx-d {
+    font-size: 11px;
+    color: var(--ink-3);
+    line-height: 1.4;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 11px 18px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 1000;
+    animation: tin 0.25s ease;
+  }
+  @keyframes tin { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+  /* EMPTY */
+  .empty {
+    text-align: center;
+    padding: 24px 14px;
+    color: var(--ink-4);
+    font-size: 13px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 24px 0;
+  }
+
+  /* MATRIX TASKS */
+  .mtx-tasks {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+  }
+  .mtx-tasks li {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 4px 0;
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.4;
+  }
+  .mtx-tasks li .x {
+    color: var(--ink-4);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    flex-shrink: 0;
+    padding: 0 2px;
+  }
+  .mtx-tasks li .x:hover { color: var(--warn); }
+  .mtx-add {
+    display: flex;
+    gap: 4px;
+    margin-top: 10px;
+  }
+  .mtx-add input {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    background: var(--bg);
+  }
+  .mtx-add button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .mtx-empty {
+    font-size: 11px;
+    color: var(--ink-4);
+    font-style: italic;
+    margin-top: 6px;
+  }
+  .mtx-cell { display: flex; flex-direction: column; min-height: 140px; }
+  .mtx-cell .mtx-content { flex: 1; }
+
+  /* WISDOM EDIT */
+  .w-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .w-actions button {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+  .w-actions button.del { color: var(--warn); }
+  .w-edit-form { padding: 4px 0; }
+  .w-edit-form input, .w-edit-form textarea, .w-edit-form select {
+    margin-bottom: 8px;
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  .w-edit-form .form-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  /* RITUAL HISTORY */
+  .ritual-item {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    background: var(--bg);
+  }
+  .ritual-item:active { background: var(--bg-2); }
+  .ritual-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ritual-preview {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .ritual-detail {
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .ritual-item.open .ritual-detail { display: block; }
+  .ritual-item.open .ritual-preview { display: none; }
+  .ritual-field {
+    margin-bottom: 10px;
+  }
+  .ritual-field .rf-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-4);
+    margin-bottom: 3px;
+  }
+  .ritual-field .rf-val {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  /* FAB - Floating action button */
+  .fab {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+    font-size: 24px;
+    line-height: 1;
+    padding: 0;
+  }
+  .fab:active { transform: scale(0.95); }
+
+  /* MODAL */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .modal-bg.show { display: flex; animation: mbgin 0.2s ease; }
+  @keyframes mbgin { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--bg);
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: min 0.25s ease;
+  }
+  @keyframes min { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--line-2);
+    border-radius: 2px;
+    margin: -8px auto 16px;
+  }
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .modal-sub {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 16px;
+  }
+
+  /* LIFE GRID */
+  .life-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .life-stat {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .life-stat .ls-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .life-stat .ls-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-4);
+    margin-top: 6px;
+  }
+  .life-stat .ls-sub {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 3px;
+  }
+  .life-stat.full {
+    grid-column: span 2;
+  }
+
+  .weeks-grid {
+    display: grid;
+    grid-template-columns: repeat(52, 1fr);
+    gap: 1px;
+    margin: 16px 0;
+    padding: 4px;
+    background: var(--bg-2);
+    border-radius: 8px;
+  }
+  .week-cell {
+    aspect-ratio: 1;
+    background: var(--bg);
+    border-radius: 1px;
+    min-width: 0;
+  }
+  .week-cell.past { background: var(--ink); }
+  .week-cell.current { 
+    background: var(--warn); 
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .progress-life {
+    background: var(--bg-3);
+    border-radius: 100px;
+    height: 10px;
+    overflow: hidden;
+    margin: 8px 0 4px;
+    position: relative;
+  }
+  .progress-life > div {
+    background: linear-gradient(90deg, var(--ink) 0%, var(--ink-2) 100%);
+    height: 100%;
+    transition: width 0.8s;
+  }
+  .progress-percent {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-3);
+    text-align: right;
+    letter-spacing: 0.05em;
+  }
+
+  .life-section {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .life-section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .life-section .ls-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .life-section .ls-desc {
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .life-section .ls-big {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-right: 6px;
+  }
+
+  /* ALTER EGO */
+  .alter-card {
+    background: linear-gradient(135deg, var(--ink) 0%, #2a2a2a 100%);
+    color: var(--bg);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .alter-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .alter-card .ac-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-4);
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .alter-card .ac-name {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .alter-card .ac-context {
+    font-size: 12px;
+    color: var(--ink-4);
+    font-style: italic;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .alter-card .ac-section {
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .alter-card .ac-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-4);
+    margin-bottom: 5px;
+  }
+  .alter-card .ac-section-content {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--bg);
+  }
+  .alter-card .ac-mantra {
+    font-family: 'Manrope', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--bg);
+    padding: 14px;
+    background: rgba(255,255,255,0.05);
+    border-left: 2px solid var(--bg);
+    border-radius: 4px;
+    margin-top: 14px;
+    position: relative;
+  }
+  .alter-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    position: relative;
+  }
+  .alter-actions button {
+    flex: 1;
+    background: rgba(255,255,255,0.1);
+    color: var(--bg);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+  }
+  .alter-actions button.primary {
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .alter-list {
+    margin-top: 16px;
+  }
+  .alter-item {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .alter-item:active { background: var(--bg-2); }
+  .alter-item .ai-info { flex: 1; min-width: 0; }
+  .alter-item .ai-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .alter-item .ai-ctx {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    font-style: italic;
+  }
+  .alter-item .ai-chev {
+    color: var(--ink-4);
+    flex-shrink: 0;
+  }
+
+  /* Wizard */
+  .wizard-step {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .wizard-step .ws-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+  .wizard-step .ws-q {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+    letter-spacing: -0.015em;
+  }
+  .wizard-step .ws-help {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  /* Activation modal */
+  .activation-bg {
+    position: fixed;
+    inset: 0;
+    background: var(--ink);
+    color: var(--bg);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    flex-direction: column;
+    text-align: center;
+  }
+  .activation-bg.show { display: flex; animation: actin 0.4s ease; }
+  @keyframes actin { from { opacity: 0; } to { opacity: 1; } }
+  .activation-content {
+    max-width: 420px;
+  }
+  .activation-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ink-4);
+    margin-bottom: 14px;
+  }
+  .activation-name {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    line-height: 1;
+  }
+  .activation-mantra {
+    font-size: 22px;
+    font-style: italic;
+    line-height: 1.4;
+    margin-bottom: 32px;
+    font-weight: 500;
+  }
+  .breath-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    margin: 0 auto 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: breath 8s ease-in-out infinite;
+  }
+  @keyframes breath {
+    0%, 100% { transform: scale(0.85); }
+    50% { transform: scale(1.15); }
+  }
+  .activation-close {
+    background: var(--bg);
+    color: var(--ink);
+    border: none;
+    border-radius: 100px;
+    padding: 14px 36px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+    margin-top: 12px;
+  }
+
+  /* SETTINGS */
+  .settings-action {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .settings-action:last-child { border-bottom: none; }
+  .settings-action:active { background: var(--bg-2); }
+  .sa-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--ink);
+  }
+  .sa-icon svg { width: 18px; height: 18px; stroke-width: 1.8; }
+  .sa-icon.danger { color: var(--warn); border-color: var(--warn); }
+  .sa-info { flex: 1; min-width: 0; }
+  .sa-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .sa-desc { font-size: 12px; color: var(--ink-3); line-height: 1.4; }
+  .sa-chev { color: var(--ink-4); flex-shrink: 0; }
+
+  /* SUGGESTION */
+  .sug-list {
+    list-style: none;
+    padding: 0;
+  }
+  .sug-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .sug-list li::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--ink-3);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="logo">Codex</div>
+    <div class="day-num mono" id="dayNum">—</div>
+  </div>
+  <div class="date" id="todayDate"></div>
+</header>
+
+<main>
+
+  <!-- DIMINEAȚA -->
+  <section class="panel active" data-panel="morning">
+    <div class="section-head">
+      <div class="num mono">01 / Dimineața</div>
+      <h2>Începutul zilei</h2>
+      <div class="desc">Ritual de 5 minute. Pune-ți direcția înainte ca lumea să o pună pentru tine.</div>
+    </div>
+
+    <div class="block dark">
+      <div class="b-label" style="color: var(--ink-4);">› Citat zilnic</div>
+      <div class="pull-quote" id="morningQuote" style="color: var(--bg);">Se încarcă...</div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Întrebarea stoică</div>
+      <div class="b-title">Ce controlezi azi?</div>
+      <div class="b-sub">Marcus Aurelius • Epictet — dihotomia controlului</div>
+      <label>Lucruri sub controlul meu</label>
+      <textarea id="canControl" placeholder="Efortul, atitudinea, ce mănânc, cum răspund..."></textarea>
+      <label>Lucruri pe care trebuie să le accept</label>
+      <textarea id="cannotControl" placeholder="Vremea, deciziile altora, traficul..."></textarea>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Direcție</div>
+      <div class="b-title">Obiectivul principal</div>
+      <div class="b-sub">Napoleon Hill • Tracy — concret, măsurabil, datat</div>
+      <label>Scopul tău pe termen lung</label>
+      <textarea id="mainGoal" placeholder="Ex: 30.000 € economii până la 31.12.2028"></textarea>
+      <label>Un pas concret astăzi</label>
+      <textarea id="todayStep" placeholder="Astăzi voi face..."></textarea>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Lege de aplicat</div>
+      <div id="dailyLaw"></div>
+    </div>
+
+    <button class="btn full" onclick="saveMorning()">Salvează ritualul</button>
+
+    <div class="divider"></div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Istoric ritualuri (ultimele 14 zile)</div>
+      <div id="morningHistory"></div>
+    </div>
+  </section>
+
+  <!-- OBICEIURI -->
+  <section class="panel" data-panel="habits">
+    <div class="section-head">
+      <div class="num mono">02 / Sistem</div>
+      <h2>Obiceiuri</h2>
+      <div class="desc">Schimbarea vine din sistem, nu din motivație. James Clear.</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="v" id="todayDone">0</div>
+        <div class="l mono">Azi</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="longestStreak">0</div>
+        <div class="l mono">Serie</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="totalCount">0</div>
+        <div class="l mono">Total</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Obiceiurile mele</div>
+      <div id="habitsList"></div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Adaugă</div>
+      <input type="text" id="newHabitName" placeholder="Ex: 30 min franceză">
+      <div style="height: 10px;"></div>
+      <button class="btn full" onclick="addHabit()">+ Adaugă obicei</button>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Sugestii</div>
+      <ul class="sug-list">
+        <li>30 min limba franceză</li>
+        <li>20 min mișcare / întinderi</li>
+        <li>Citit 10 pagini</li>
+        <li>Pus deoparte X € (oricât, dar zilnic)</li>
+        <li>2 litri apă</li>
+        <li>Apel acasă</li>
+        <li>Somn 7+ ore</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONCENTRARE -->
+  <section class="panel" data-panel="focus">
+    <div class="section-head">
+      <div class="num mono">03 / Concentrare</div>
+      <h2>Muncă profundă</h2>
+      <div class="desc">Două ore concentrate bat opt împrăștiate. Cal Newport.</div>
+    </div>
+
+    <div class="block" style="text-align: center;">
+      <div class="timer-presets">
+        <button onclick="setTimer(25)" data-min="25" class="active">25 m</button>
+        <button onclick="setTimer(45)" data-min="45">45 m</button>
+        <button onclick="setTimer(60)" data-min="60">60 m</button>
+        <button onclick="setTimer(90)" data-min="90">90 m</button>
+      </div>
+
+      <div class="timer-ring">
+        <svg viewBox="0 0 200 200">
+          <circle class="bg" cx="100" cy="100" r="92" fill="none" stroke-width="2"/>
+          <circle class="fg" id="timerCircle" cx="100" cy="100" r="92" fill="none" stroke-width="2"
+                  stroke-dasharray="578" stroke-dashoffset="0" stroke-linecap="round"/>
+        </svg>
+        <div class="center-text mono" id="timerDisplay">25:00</div>
+      </div>
+
+      <div class="timer-controls">
+        <button class="btn full" id="timerStart" onclick="toggleTimer()">Start</button>
+        <button class="btn outline icon" onclick="resetTimer()" title="Reset">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Sarcină curentă</div>
+      <input type="text" id="focusTask" placeholder="Pe ce lucrezi acum?">
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Sesiunile de azi</div>
+      <div id="focusSessions"></div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Matricea Covey</div>
+      <div class="b-title">Unde îți petreci timpul?</div>
+      <div class="b-sub">Adaugă sarcinile reale și vezi unde cad. Secretul: Q2 e unde se construiește succesul.</div>
+      <div class="matrix">
+        <div class="mtx-cell q1" data-q="q1">
+          <div class="mtx-content">
+            <div class="mtx-l mono">Q1 / Crize</div>
+            <div class="mtx-t">Urgent + Important</div>
+            <div class="mtx-d">Fă acum. Dar nu trăi aici.</div>
+            <ul class="mtx-tasks" id="tasks-q1"></ul>
+            <div class="mtx-empty" id="empty-q1">Nicio sarcină</div>
+          </div>
+          <div class="mtx-add">
+            <input type="text" id="input-q1" placeholder="+ adaugă" onkeypress="if(event.key==='Enter')addCoveyTask('q1')">
+            <button onclick="addCoveyTask('q1')">+</button>
+          </div>
+        </div>
+        <div class="mtx-cell" data-q="q2" style="border-color: var(--ink);">
+          <div class="mtx-content">
+            <div class="mtx-l mono" style="color: var(--ink);">Q2 / Creștere ★</div>
+            <div class="mtx-t">Important, nu urgent</div>
+            <div class="mtx-d">Aici trăiește succesul. Învățare, sport, planificare.</div>
+            <ul class="mtx-tasks" id="tasks-q2"></ul>
+            <div class="mtx-empty" id="empty-q2">Niciuna — aici e problema</div>
+          </div>
+          <div class="mtx-add">
+            <input type="text" id="input-q2" placeholder="+ adaugă" onkeypress="if(event.key==='Enter')addCoveyTask('q2')">
+            <button onclick="addCoveyTask('q2')">+</button>
+          </div>
+        </div>
+        <div class="mtx-cell" data-q="q3">
+          <div class="mtx-content">
+            <div class="mtx-l mono">Q3 / Iluzii</div>
+            <div class="mtx-t">Urgent, nu important</div>
+            <div class="mtx-d">Cererile altora. Deleagă sau redu.</div>
+            <ul class="mtx-tasks" id="tasks-q3"></ul>
+            <div class="mtx-empty" id="empty-q3">Nicio sarcină</div>
+          </div>
+          <div class="mtx-add">
+            <input type="text" id="input-q3" placeholder="+ adaugă" onkeypress="if(event.key==='Enter')addCoveyTask('q3')">
+            <button onclick="addCoveyTask('q3')">+</button>
+          </div>
+        </div>
+        <div class="mtx-cell" data-q="q4">
+          <div class="mtx-content">
+            <div class="mtx-l mono">Q4 / Pierdere</div>
+            <div class="mtx-t">Niciuna</div>
+            <div class="mtx-d">Scroll, TV fără sens. Elimină.</div>
+            <ul class="mtx-tasks" id="tasks-q4"></ul>
+            <div class="mtx-empty" id="empty-q4">Nicio sarcină</div>
+          </div>
+          <div class="mtx-add">
+            <input type="text" id="input-q4" placeholder="+ adaugă" onkeypress="if(event.key==='Enter')addCoveyTask('q4')">
+            <button onclick="addCoveyTask('q4')">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BANI -->
+  <section class="panel" data-panel="money">
+    <div class="section-head">
+      <div class="num mono">04 / Capital</div>
+      <h2>Bani</h2>
+      <div class="desc">Templar • Kiyosaki • Housel • Clason</div>
+    </div>
+
+    <div class="block dark">
+      <div class="b-label" style="color: var(--ink-4);">› Principiu</div>
+      <div class="pull-quote" style="color: var(--bg);">Bogăția nu e ce vezi. Sunt mașinile necumpărate, lucrurile la care ai zis nu.<span class="author">Morgan Housel</span></div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Buget lunar</div>
+      <div class="b-title">Cât intră, cât iese</div>
+      <label>Venit lunar (€)</label>
+      <input type="number" id="income" placeholder="Ex: 2400">
+      <label>Cheltuieli necesare (chirie, mâncare, transport)</label>
+      <input type="number" id="essentials" placeholder="Ex: 900">
+      <label>Țintă economii (%)</label>
+      <input type="number" id="savePercent" placeholder="Recomandat: 30-50%" value="30">
+      <div style="height: 12px;"></div>
+      <button class="btn full" onclick="calculateMoney()">Calculează</button>
+    </div>
+
+    <div class="block" id="moneyResults" style="display:none;">
+      <div class="b-label"><span class="dot"></span>Rezultat</div>
+      <div class="m-row"><span class="lbl">Venit</span><span class="val mono" id="rIncome">—</span></div>
+      <div class="m-row"><span class="lbl">Cheltuieli necesare</span><span class="val mono neg" id="rEssentials">—</span></div>
+      <div class="m-row"><span class="lbl">Economii lunare</span><span class="val mono pos" id="rSavings">—</span></div>
+      <div class="m-row total"><span class="lbl">Bani liberi</span><span class="val mono" id="rFree">—</span></div>
+      <div class="progress"><div id="savingsProgress" style="width: 0%"></div></div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Dobândă compusă</div>
+      <div class="b-title">Magia timpului</div>
+      <div class="b-sub">Calculează cât devin banii puși deoparte în timp</div>
+      <label>Sumă lunară (€)</label>
+      <input type="number" id="monthlyInvest" placeholder="Ex: 500">
+      <label>Ani</label>
+      <input type="number" id="years" placeholder="Ex: 10" value="10">
+      <label>Randament anual (%)</label>
+      <input type="number" id="rate" placeholder="ETF S&P 500 mediu: 6-8%" value="6">
+      <div style="height: 12px;"></div>
+      <button class="btn full" onclick="calculateCompound()">Proiectează</button>
+      <div id="compoundResult"></div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Activ sau pasiv?</div>
+      <div class="b-title">Test Kiyosaki</div>
+      <div class="b-sub">Înainte de orice cumpărătură mare</div>
+      <label>Ce vrei să cumperi</label>
+      <input type="text" id="purchaseItem" placeholder="Ex: mașină second-hand">
+      <label>Preț (€)</label>
+      <input type="number" id="purchasePrice" placeholder="Ex: 8000">
+      <label>Generează venit lunar?</label>
+      <select id="generates">
+        <option value="">— alege —</option>
+        <option value="yes">Da, generează venit</option>
+        <option value="maybe">Poate, peste timp</option>
+        <option value="no">Nu, doar costă</option>
+      </select>
+      <div style="height: 12px;"></div>
+      <button class="btn full" onclick="evaluatePurchase()">Evaluează</button>
+      <div id="purchaseResult"></div>
+    </div>
+  </section>
+
+  <!-- DECIZII -->
+  <section class="panel" data-panel="decisions">
+    <div class="section-head">
+      <div class="num mono">05 / Gândire</div>
+      <h2>Decizii</h2>
+      <div class="desc">Kahneman • Holiday • Dweck</div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Regula 24h</div>
+      <div class="b-title">Decizie importantă</div>
+      <div class="b-sub">Scrie, dormi, decide mâine cu mintea limpede</div>
+      <label>Decizia</label>
+      <textarea id="decisionTitle" placeholder="Ex: schimb jobul"></textarea>
+      <div class="pro-con">
+        <div class="pc-col pro">
+          <h4>+ Pentru</h4>
+          <textarea id="decisionPro" placeholder="Beneficii..."></textarea>
+        </div>
+        <div class="pc-col con">
+          <h4>− Împotrivă</h4>
+          <textarea id="decisionCon" placeholder="Riscuri..."></textarea>
+        </div>
+      </div>
+      <label>Privește din afară: ce ai sfătui un prieten?</label>
+      <textarea id="decisionWise" placeholder="Perspectiva unui mentor..."></textarea>
+      <div style="height: 12px;"></div>
+      <button class="btn full" onclick="saveDecision()">Salvează</button>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Reframer mental</div>
+      <div class="b-title">Mentalitate de creștere</div>
+      <div class="b-sub">Carol Dweck — magia cuvântului „încă"</div>
+      <label>Gândul negativ</label>
+      <input type="text" id="negThought" placeholder='Ex: "Nu sunt bun la franceză"'>
+      <div style="height: 12px;"></div>
+      <button class="btn full outline" onclick="reframe()">Reformulează</button>
+      <div id="reframeResult"></div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Obstacol → oportunitate</div>
+      <div class="b-title">Calea</div>
+      <div class="b-sub">Ryan Holiday — obstacolul devine drumul</div>
+      <label>Ce te blochează acum?</label>
+      <textarea id="obstacle" placeholder="Descrie problema concretă"></textarea>
+      <div style="height: 12px;"></div>
+      <button class="btn full" onclick="transformObstacle()">Transformă</button>
+      <div id="obstacleResult"></div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Deciziile tale</div>
+      <div id="decisionsList"></div>
+    </div>
+  </section>
+
+  <!-- ÎNȚELEPCIUNE -->
+  <section class="panel" data-panel="wisdom">
+    <div class="section-head">
+      <div class="num mono">06 / Bibliotecă</div>
+      <h2>Înțelepciune</h2>
+      <div class="desc">65 de principii consultabile. Pentru momente concrete.</div>
+    </div>
+
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="wisdomSearch" placeholder="Caută..." oninput="searchWisdom()">
+    </div>
+
+    <div class="filter-row" id="wisdomFilters">
+      <button class="active" onclick="filterWisdom('all', this)">Toate</button>
+      <button onclick="filterWisdom('stratagems', this)">Stratageme</button>
+      <button onclick="filterWisdom('power', this)">Putere</button>
+      <button onclick="filterWisdom('influence', this)">Influență</button>
+      <button onclick="filterWisdom('negotiation', this)">Negociere</button>
+      <button onclick="filterWisdom('success', this)">Succes</button>
+      <button onclick="filterWisdom('wealth', this)">Bani</button>
+      <button onclick="filterWisdom('stoic', this)">Stoicism</button>
+      <button onclick="filterWisdom('custom', this)">Al meu</button>
+    </div>
+
+    <div id="wisdomList"></div>
+  </section>
+
+  <!-- ALTER EGO -->
+  <section class="panel" data-panel="alter">
+    <div class="section-head">
+      <div class="num mono">10 / Identitate</div>
+      <h2>Alter Ego</h2>
+      <div class="desc">Versiunea ta din care vrei să operezi când contează. Todd Herman: nu prefăcătorie — acces.</div>
+    </div>
+
+    <!-- LISTA alter ego-urilor existente -->
+    <div id="alterListView">
+      <div id="alterCards"></div>
+      
+      <div class="block" style="margin-top: 16px;">
+        <div class="b-label"><span class="dot"></span>Adaugă</div>
+        <button class="btn full" onclick="startAlterWizard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Construiește un alter ego nou
+        </button>
+      </div>
+
+      <div class="block">
+        <div class="b-label"><span class="dot"></span>De ce funcționează</div>
+        <div style="font-size: 13px; color: var(--ink-2); line-height: 1.6;">
+          Nu inventezi cine nu ești. Accesezi cine poți fi.<br><br>
+          Kobe avea „Black Mamba". Beyoncé avea „Sasha Fierce". Tu însuți ești deja un alter ego când treci de la prieteni la conversație cu șeful — doar că nu îl alegi conștient.<br><br>
+          <em style="color: var(--ink-3);">„Devii ceea ce decizi că ești. Nu ce simți că ești."</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIZARD - construcție alter ego -->
+    <div id="alterWizardView" style="display:none;">
+      <div class="block">
+        <div class="b-label"><span class="dot"></span>Pas cu pas</div>
+        <div class="b-title">Construiește-ți alter ego-ul</div>
+        <div class="b-sub">Răspunde la toate. Cu cât mai concret, cu atât mai puternic.</div>
+      </div>
+
+      <div class="wizard-step">
+        <div class="ws-num mono">01 / Context</div>
+        <div class="ws-q">Unde ai nevoie de el?</div>
+        <div class="ws-help">Nu ai nevoie de alter ego pentru toată viața. Doar pentru momente specifice unde versiunea ta obișnuită nu performează.</div>
+        <input type="text" id="alterContext" placeholder="Ex: negocieri cu patronul, prezentări, discuții grele">
+      </div>
+
+      <div class="wizard-step">
+        <div class="ws-num mono">02 / Nume</div>
+        <div class="ws-q">Cum îl cheamă?</div>
+        <div class="ws-help">Numele ancorează identitatea. Poate fi un cuvânt, un personaj, o calitate. „Constructorul", „Lupul", „Maestrul" — orice rezonează cu tine.</div>
+        <input type="text" id="alterName" placeholder="Ex: Constructorul">
+      </div>
+
+      <div class="wizard-step">
+        <div class="ws-num mono">03 / Calități</div>
+        <div class="ws-q">Cum este?</div>
+        <div class="ws-help">3-5 calități esențiale. Adjective concrete, nu abstracții. „Calm", „direct", „nu se grăbește", „știe ce vrea".</div>
+        <textarea id="alterTraits" placeholder="Calm. Vorbește puțin dar la obiect. Privește în ochi. Nu se grăbește. Are cifre pregătite."></textarea>
+      </div>
+
+      <div class="wizard-step">
+        <div class="ws-num mono">04 / Model</div>
+        <div class="ws-q">După cine se inspiră?</div>
+        <div class="ws-help">O persoană reală, un personaj de film, un erou. Cineva care întruchipează calitățile alea. Nu copiezi — împrumuți energia.</div>
+        <input type="text" id="alterModel" placeholder="Ex: un meșter bătrân pe care îl respectai, Tommy Shelby, Marcus Aurelius">
+      </div>
+
+      <div class="wizard-step">
+        <div class="ws-num mono">05 / Totem</div>
+        <div class="ws-q">Ce obiect / gest îl declanșează?</div>
+        <div class="ws-help">Un obiect mic sau gest care „pune costumul". Kobe avea o bandă pe braț. Tu poate ai un inel, o șapcă, un stilou, sau pur și simplu te freci pe față.</div>
+        <input type="text" id="alterTotem" placeholder="Ex: ceasul, șapca neagră, inhalez adânc de 3 ori">
+      </div>
+
+      <div class="wizard-step">
+        <div class="ws-num mono">06 / Mantra</div>
+        <div class="ws-q">Ce-și spune?</div>
+        <div class="ws-help">O frază scurtă pe care o repeți când îl activezi. Trebuie să te încarce, să-ți schimbe starea.</div>
+        <textarea id="alterMantra" placeholder='Ex: "Sunt aici pentru o singură decizie. O iau eu, nu reacționez la altcineva."'></textarea>
+      </div>
+
+      <div class="wizard-step">
+        <div class="ws-num mono">07 / Ce NU este</div>
+        <div class="ws-q">Ce comportamente lasă în afară?</div>
+        <div class="ws-help">La fel de important ca ce este. Ce nu face niciodată acest alter ego? Ce frică, ce reacție, ce slăbiciune nu mai apare?</div>
+        <textarea id="alterNot" placeholder='Ex: nu se scuză, nu acceptă tăcut, nu se grăbește să răspundă, nu cere "te rog"'></textarea>
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <button class="btn outline" onclick="cancelAlterWizard()" style="flex: 1;">Anulează</button>
+        <button class="btn" onclick="saveAlterEgo()" style="flex: 2;">Creează alter ego-ul</button>
+      </div>
+    </div>
+
+    <!-- DETALII alter ego selectat -->
+    <div id="alterDetailView" style="display:none;">
+      <button class="btn outline small" onclick="backToAlterList()" style="margin-bottom: 14px;">← Înapoi</button>
+      <div id="alterDetailContent"></div>
+      <div style="margin-top: 16px; display: flex; gap: 8px;">
+        <button class="btn outline" onclick="editAlterEgo()" style="flex: 1;">Modifică</button>
+        <button class="btn outline" onclick="deleteAlterEgo()" style="flex: 1; color: var(--warn); border-color: var(--warn);">Șterge</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal activare -->
+  <div class="activation-bg" id="activationModal">
+    <div class="activation-content">
+      <div class="activation-label mono">Activez</div>
+      <div class="activation-name" id="activationName">—</div>
+      <div class="breath-circle" id="breathCircle">Respiră</div>
+      <div class="activation-mantra" id="activationMantra">—</div>
+      <button class="activation-close" onclick="closeActivation()">Sunt pregătit</button>
+    </div>
+  </div>
+
+  <!-- VIAȚA -->
+  <section class="panel" data-panel="life">
+    <div class="section-head">
+      <div class="num mono">09 / Memento mori</div>
+      <h2>Viața ta</h2>
+      <div class="desc">„Nu trăim puțin, doar pierdem mult." — Seneca</div>
+    </div>
+
+    <div class="block" id="lifeSetup">
+      <div class="b-label"><span class="dot"></span>Configurare</div>
+      <div class="b-title">Setează datele</div>
+      <div class="b-sub">Doar prima dată. Se salvează pe telefon.</div>
+      <label>Data nașterii</label>
+      <input type="date" id="birthDate">
+      <label>Speranță de viață (ani)</label>
+      <input type="number" id="lifeExpectancy" placeholder="Default: 80" value="80">
+      <div style="height: 12px;"></div>
+      <button class="btn full" onclick="saveLifeData()">Salvează</button>
+    </div>
+
+    <div id="lifeView" style="display:none;">
+      <div class="block dark">
+        <div class="b-label" style="color: var(--ink-4);">› Citat</div>
+        <div class="pull-quote" style="color: var(--bg);">Ține minte că vei muri. Nu pentru a fi trist — pentru a fi treaz.<span class="author">Marcus Aurelius</span></div>
+      </div>
+
+      <div class="life-stats">
+        <div class="life-stat">
+          <div class="ls-num mono" id="ageDisplay">—</div>
+          <div class="ls-label mono">Ani trăiți</div>
+          <div class="ls-sub" id="ageDays">—</div>
+        </div>
+        <div class="life-stat">
+          <div class="ls-num mono" id="yearsLeft">—</div>
+          <div class="ls-label mono">Ani rămași (estimat)</div>
+          <div class="ls-sub" id="daysLeft">—</div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="b-label"><span class="dot"></span>Procent trăit</div>
+        <div class="b-title" id="percentLived">—%</div>
+        <div class="progress-life"><div id="lifeProgress" style="width: 0%"></div></div>
+        <div class="progress-percent mono" id="progressNote">—</div>
+      </div>
+
+      <div class="block">
+        <div class="b-label"><span class="dot"></span>Săptămânile vieții tale</div>
+        <div class="b-title">Fiecare pătrat = o săptămână</div>
+        <div class="b-sub">Negre = trăite. Roșu = săptămâna curentă. Goale = rămase.</div>
+        <div class="weeks-grid" id="weeksGrid"></div>
+        <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-4); margin-top: 6px;">
+          <span>← naștere</span>
+          <span id="weeksGridInfo">—</span>
+          <span>moarte estimată →</span>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="b-label"><span class="dot"></span>Concret</div>
+        <div class="b-title">Ce-ți mai rămâne</div>
+        <div class="b-sub">Dacă-ți pare puțin, e bine — asta e ideea.</div>
+        
+        <div style="margin-top: 14px;">
+          <div class="life-section">
+            <div class="ls-title"><span class="ls-big mono" id="summersLeft">—</span>veri</div>
+            <div class="ls-desc">Câte veri îți mai rămân de bucurat.</div>
+          </div>
+          <div class="life-section">
+            <div class="ls-title"><span class="ls-big mono" id="christmasLeft">—</span>Crăciunuri</div>
+            <div class="ls-desc">Cu cei dragi, dacă ești cu ei toți.</div>
+          </div>
+          <div class="life-section">
+            <div class="ls-title"><span class="ls-big mono" id="weekendsLeft">—</span>weekenduri</div>
+            <div class="ls-desc">Folosește-le. Sunt mai puține decât crezi.</div>
+          </div>
+          <div class="life-section">
+            <div class="ls-title"><span class="ls-big mono" id="workYearsLeft">—</span>ani productivi</div>
+            <div class="ls-desc">Până la 65 de ani. Acum sunt anii în care construiești.</div>
+          </div>
+          <div class="life-section">
+            <div class="ls-title"><span class="ls-big mono" id="hoursLeft">—</span>ore</div>
+            <div class="ls-desc">Total ore rămase. Scroll de 2 ore/zi = câți ani pierzi?</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="b-label"><span class="dot"></span>Reflecție</div>
+        <div style="font-size: 14px; color: var(--ink-2); line-height: 1.6;">
+          Asta nu e pentru a te speria. E pentru a te trezi.<br><br>
+          Dacă vezi că ți-au rămas <strong id="reflectYears">—</strong> ani și încă amâni franceza, sportul, pasul important — întrebarea e simplă: <em>când?</em><br><br>
+          „Cel mai bun moment să plantezi un copac a fost acum 20 de ani. Al doilea — acum."
+        </div>
+      </div>
+
+      <button class="btn outline full" onclick="resetLifeData()">Resetează datele</button>
+    </div>
+  </section>
+
+  <!-- SETĂRI -->
+  <section class="panel" data-panel="settings">
+    <div class="section-head">
+      <div class="num mono">⚙ / Date</div>
+      <h2>Setări</h2>
+      <div class="desc">Salvează-ți datele într-un fișier sau încarcă un backup anterior.</div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Backup</div>
+
+      <div class="settings-action" onclick="exportAllData()">
+        <div class="sa-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div class="sa-info">
+          <div class="sa-title">Descarcă backup</div>
+          <div class="sa-desc">Salvează toate datele într-un fișier pe telefon</div>
+        </div>
+        <svg class="sa-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <div class="settings-action" onclick="document.getElementById('importFile').click()">
+        <div class="sa-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="sa-info">
+          <div class="sa-title">Încarcă backup</div>
+          <div class="sa-desc">Recuperează datele dintr-un fișier salvat anterior</div>
+        </div>
+        <svg class="sa-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importAllData(event)">
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Statistici</div>
+      <div id="dataStats" style="font-size: 13px; color: var(--ink-2); line-height: 1.8;"></div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Zonă periculoasă</div>
+      <div class="settings-action" onclick="resetAllData()">
+        <div class="sa-icon danger">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </div>
+        <div class="sa-info">
+          <div class="sa-title" style="color: var(--warn);">Șterge totul</div>
+          <div class="sa-desc">Resetează aplicația. Nu se poate anula.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block" style="background: var(--bg-2);">
+      <div class="b-label"><span class="dot"></span>Sfat</div>
+      <div style="font-size: 13px; color: var(--ink-2); line-height: 1.6;">
+        Fă un backup la fiecare 1-2 săptămâni. Salvează fișierul în Google Drive, iCloud sau pe email — așa nu pierzi nimic dacă schimbi telefonul sau ștergi browserul.
+      </div>
+    </div>
+  </section>
+
+  <!-- FAB pentru adăugare în bibliotecă -->
+  <button class="fab" id="wisdomFab" onclick="openAddWisdomModal()" style="display:none;">+</button>
+
+  <!-- CITATE -->
+  <section class="panel" data-panel="quotes">
+    <div class="section-head">
+      <div class="num mono">08 / Inspirație</div>
+      <h2>Citate</h2>
+      <div class="desc">Colecția ta. Citatul afișat dimineața se rotește în fiecare zi prin lista de mai jos.</div>
+    </div>
+
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="quotesSearch" placeholder="Caută în citate..." oninput="renderQuotes()">
+    </div>
+
+    <div id="quotesList"></div>
+
+    <!-- FAB pentru citate -->
+    <button class="fab" id="quotesFab" onclick="openAddQuoteModal()" style="display:none;">+</button>
+  </section>
+
+  <!-- Modal adăugare/editare citat -->
+  <div class="modal-bg" id="quoteModal" onclick="if(event.target===this)closeQuoteModal()">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="quoteModalTitle">Adaugă citat nou</div>
+      <div class="modal-sub" id="quoteModalSub">Adaugă unul care îți vorbește</div>
+      <div class="w-edit-form">
+        <label>Textul citatului</label>
+        <textarea id="modalQText" placeholder="Ex: Nu te ridici la nivelul țelurilor. Cazi la nivelul sistemelor tale."></textarea>
+        <label>Autor</label>
+        <input type="text" id="modalQAuthor" placeholder="Ex: James Clear">
+        <div class="form-actions">
+          <button class="btn full" onclick="saveQuoteItem()">Salvează</button>
+          <button class="btn outline" onclick="closeQuoteModal()">Anulează</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal adăugare/editare wisdom -->
+  <div class="modal-bg" id="wisdomModal" onclick="if(event.target===this)closeWisdomModal()">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="modalTitle">Adaugă principiu nou</div>
+      <div class="modal-sub" id="modalSub">Construiește-ți propria bibliotecă</div>
+      <div class="w-edit-form">
+        <label>Titlu</label>
+        <input type="text" id="modalWTitle" placeholder="Ex: Regula 80/20">
+        <label>Categorie</label>
+        <select id="modalWCat">
+          <option value="stratagems">Stratagemă</option>
+          <option value="power">Putere</option>
+          <option value="influence">Influență</option>
+          <option value="negotiation">Negociere</option>
+          <option value="success">Succes</option>
+          <option value="wealth">Bani</option>
+          <option value="stoic">Stoicism</option>
+          <option value="custom">Propriul meu</option>
+        </select>
+        <label>Descriere</label>
+        <textarea id="modalWDesc" placeholder="Explicația principiului..."></textarea>
+        <label>Sursă (opțional)</label>
+        <input type="text" id="modalWSrc" placeholder="Ex: Pareto / experiență proprie">
+        <div class="form-actions">
+          <button class="btn full" onclick="saveWisdomItem()">Salvează</button>
+          <button class="btn outline" onclick="closeWisdomModal()">Anulează</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARA -->
+  <section class="panel" data-panel="evening">
+    <div class="section-head">
+      <div class="num mono">07 / Seara</div>
+      <h2>Închiderea zilei</h2>
+      <div class="desc">Examen stoic. 5 minute. Fără auto-flagelare — doar observație.</div>
+    </div>
+
+    <div class="block dark">
+      <div class="b-label" style="color: var(--ink-4);">› Principiu</div>
+      <div class="pull-quote" style="color: var(--bg);">Nu lăsa somnul să-ți închidă ochii blânzi până nu ai parcurs de trei ori ce ai făcut azi.<span class="author">Pythagora (citat de Seneca)</span></div>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>I</div>
+      <div class="b-title">Ce am făcut bine?</div>
+      <textarea id="eveningGood" placeholder="Victoriile mici contează..."></textarea>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>II</div>
+      <div class="b-title">Ce am ratat?</div>
+      <textarea id="eveningBad" placeholder="Doar observație, fără vinovăție..."></textarea>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>III</div>
+      <div class="b-title">Ce schimb mâine?</div>
+      <textarea id="eveningChange" placeholder="O singură schimbare concretă..."></textarea>
+    </div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>IV</div>
+      <div class="b-title">Recunoștință</div>
+      <textarea id="eveningGratitude" placeholder="3 lucruri..."></textarea>
+    </div>
+
+    <button class="btn full" onclick="saveEvening()">Închide ziua</button>
+
+    <div class="divider"></div>
+
+    <div class="block">
+      <div class="b-label"><span class="dot"></span>Jurnal (ultimele 7 zile)</div>
+      <div id="journalList"></div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabbar" id="tabbar">
+  <button data-tab="morning" class="active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M5 5l1.5 1.5M17.5 17.5L19 19M2 12h2M20 12h2M5 19l1.5-1.5M17.5 6.5L19 5"/></svg>
+    <span class="label">Dim.</span>
+  </button>
+  <button data-tab="habits">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span class="label">Sistem</span>
+  </button>
+  <button data-tab="focus">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span class="label">Focus</span>
+  </button>
+  <button data-tab="evening">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <span class="label">Seara</span>
+  </button>
+  <button onclick="openMoreMenu()" id="moreBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+    <span class="label">Mai mult</span>
+  </button>
+</nav>
+
+<!-- More menu modal -->
+<div class="more-menu-bg" id="moreMenuBg" onclick="if(event.target===this)closeMoreMenu()">
+  <div class="more-menu">
+    <div class="modal-handle"></div>
+    <div class="more-title">Mai mult</div>
+    <div class="more-grid">
+      <div class="more-item" onclick="goToTab('alter')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div class="more-label">Alter Ego</div>
+        <div class="more-desc">Cine devii</div>
+      </div>
+      <div class="more-item" onclick="goToTab('money')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <div class="more-label">Bani</div>
+        <div class="more-desc">Buget, dobândă</div>
+      </div>
+      <div class="more-item" onclick="goToTab('decisions')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12c0 4.97-4.03 9-9 9-2.39 0-4.56-.93-6.17-2.45L3 21l2.45-2.83A8.96 8.96 0 0 1 3 12c0-4.97 4.03-9 9-9s9 4.03 9 9z"/></svg>
+        <div class="more-label">Decizii</div>
+        <div class="more-desc">Pro/contra, reframe</div>
+      </div>
+      <div class="more-item" onclick="goToTab('wisdom')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <div class="more-label">Bibliotecă</div>
+        <div class="more-desc">Principii</div>
+      </div>
+      <div class="more-item" onclick="goToTab('quotes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2h2.5"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2h2.5"/></svg>
+        <div class="more-label">Citate</div>
+        <div class="more-desc">Colecția ta</div>
+      </div>
+      <div class="more-item" onclick="goToTab('life')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h12"/><path d="M6 22h12"/><path d="M6 2v4a6 6 0 0 0 12 0V2"/><path d="M6 22v-4a6 6 0 0 1 12 0v4"/></svg>
+        <div class="more-label">Viața</div>
+        <div class="more-desc">Memento mori</div>
+      </div>
+      <div class="more-item" onclick="goToTab('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6"/><path d="M4.22 4.22l4.24 4.24m7.07 7.07l4.24 4.24"/><path d="M1 12h6m10 0h6"/><path d="M4.22 19.78l4.24-4.24m7.07-7.07l4.24-4.24"/></svg>
+        <div class="more-label">Setări</div>
+        <div class="more-desc">Backup, date</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+
+const QUOTES = [
+  { text: "Nu mai sta și discuta cum trebuie să fie un om bun. Fii unul.", author: "Marcus Aurelius" },
+  { text: "Cel care e stăpân pe sine însuși e mai puternic decât cel care cucerește o cetate.", author: "Lao Tzu" },
+  { text: "Nu lucrurile ne tulbură, ci părerile noastre despre ele.", author: "Epictet" },
+  { text: "Avem două urechi și o gură. Asculți de două ori mai mult decât vorbești.", author: "Zenon" },
+  { text: "Cunoaște-l pe celălalt și cunoaște-te pe tine, și nu vei fi învins în o sută de bătălii.", author: "Sun Tzu" },
+  { text: "Cel mai bun moment să plantezi un copac a fost acum 20 de ani. Al doilea — acum.", author: "Proverb chinezesc" },
+  { text: "Cheltuie mai puțin decât câștigi. E singura regulă financiară absolută.", author: "Richard Templar" },
+  { text: "Banii sunt comportament, nu inteligență.", author: "Morgan Housel" },
+  { text: "Nu te ridici la nivelul țelurilor. Cazi la nivelul sistemelor tale.", author: "James Clear" },
+  { text: "Disciplina cântărește grame. Regretul cântărește tone.", author: "Jim Rohn" },
+  { text: "Ești media celor cinci oameni cu care îți petreci cel mai mult timp.", author: "Jim Rohn" },
+  { text: "Aparențele guvernează lumea.", author: "Machiavelli" },
+  { text: "Cel mai mare obstacol al vieții e așteptarea: depinde de mâine și pierde ziua de azi.", author: "Seneca" },
+  { text: "Calitatea unei vieți e calitatea atenției tale.", author: "Cal Newport" },
+  { text: "Obstacolul în calea acțiunii devine acțiunea. Ce stă în drum, devine drumul.", author: "Marcus Aurelius" },
+  { text: "Bogăția e ce nu vezi.", author: "Morgan Housel" },
+  { text: "Bogăția nu e a celui care are mult, ci a celui care are nevoie de puțin.", author: "Epictet" },
+  { text: "Ce nu te omoară, te face mai puternic.", author: "Nietzsche" },
+];
+
+const TRACY_LAWS = [
+  { num: 1, title: "Legea cauzei și efectului", desc: "Tot ce se întâmplă are o cauză. Pentru alt rezultat, schimbă cauza — adică ce faci tu." },
+  { num: 2, title: "Legea credinței", desc: "Devii ceea ce crezi cu convingere despre tine. Schimbă povestea din mintea ta înainte să schimbi realitatea." },
+  { num: 3, title: "Legea așteptărilor", desc: "Primești ce te aștepți să primești. Așteaptă-te la mai mult." },
+  { num: 4, title: "Legea atracției", desc: "Atragi ce ești, nu ce vrei. Devino întâi tipul de om care obține X, apoi vine X." },
+  { num: 5, title: "Legea controlului", desc: "Te simți bine în viață în măsura în care simți control asupra ei." },
+  { num: 6, title: "Legea responsabilității", desc: "Tu ești 100% responsabil de viața ta. Fără scuze, fără vinovați." },
+  { num: 7, title: "Legea direcției", desc: "Obiectivele clare, scrise, datate, sunt motorul. Fără ele, plutești." },
+  { num: 8, title: "Legea compensației", desc: "Primești exact cât oferi. Vrei mai mult? Oferă mai multă valoare." },
+  { num: 9, title: "Legea efortului aplicat", desc: "Toate marile realizări vin din efort susținut, nu din inspirație." },
+  { num: 10, title: "Legea supracompensației", desc: "Cei care reușesc dau întotdeauna mai mult decât li se cere." },
+  { num: 11, title: "Legea pregătirii", desc: "Norocul favorizează pe cei pregătiți." },
+  { num: 12, title: "Legea deciziei", desc: "Toate succesele încep cu o decizie clară. Indecizia e dușmanul." },
+  { num: 13, title: "Legea perseverenței", desc: "Cine nu renunță, câștigă. Majoritatea renunță exact înainte de rezultat." },
+  { num: 14, title: "Legea specializării", desc: "Specializare > generalizare. Cei specializați câștigă mai mult." },
+  { num: 15, title: "Legea excelenței", desc: "Fii în primii 10% în domeniul tău. Acolo sunt banii și libertatea." },
+  { num: 16, title: "Legea integrității", desc: "Reputația e capitalul cel mai valoros." },
+  { num: 17, title: "Legea curajului", desc: "Cele mai mari recompense sunt dincolo de zona ta de confort." },
+  { num: 18, title: "Legea realismului", desc: "Vezi lumea cum este, nu cum ai vrea. Decizii bune se iau pe fapte." },
+  { num: 19, title: "Legea economisirii", desc: "Minimum 10% deoparte, automat, înainte de orice cheltuială." },
+  { num: 20, title: "Legea dobânzii compuse", desc: "Banii puși deoparte devreme devin avere la maturitate." },
+];
+
+const STRATAGEMS = [
+  { num: 1, title: "Extinderea", desc: "Adversarul exagerează afirmația ta dincolo de limite. Răspuns: precizează imediat limitele exacte." },
+  { num: 2, title: "Omonimia", desc: "Folosește ambiguitatea unui cuvânt. Răspuns: cere definiția exactă." },
+  { num: 3, title: "Generalizarea relativă", desc: "Iei ce s-a spus într-un context și-l tratezi ca absolut. Răspuns: reamintește contextul." },
+  { num: 4, title: "Ascunderea concluziei", desc: "Întrebări răzlețe pentru a ascunde unde se ajunge. Răspuns: cere concluzia direct." },
+  { num: 8, title: "Provocarea furiei", desc: "Te enervează ca să nu gândești clar. Răspuns: respiră, pauză, calm." },
+  { num: 12, title: "Cuvinte favorabile", desc: "Folosește termeni care îi avantajează (libertate vs. dezordine). Răspuns: schimbă termenii." },
+  { num: 14, title: "Victorie prematură", desc: "Trage triumfător o concluzie care nu rezultă. Răspuns: cere să arate cum a ajuns acolo." },
+  { num: 18, title: "Întreruperea", desc: "Când pierde, schimbă subiectul. Răspuns: insistă să se revină la punct." },
+  { num: 28, title: "Argument către public", desc: "Obiecție care pare validă pentru neexperți. Răspuns: explică simplu." },
+  { num: 30, title: "Argument autoritate", desc: "Citează nume mari irelevante. Răspuns: separă ideea de autor." },
+  { num: 32, title: "Asociere odioasă", desc: "Pune ideea în categorie urâtă (fascism, comunism). Răspuns: refuză eticheta." },
+  { num: 36, title: "Avalanșa de cuvinte", desc: "Vorbește mult, complicat, să crezi că nu înțelegi. Răspuns: cere 3 propoziții simple." },
+  { num: 38, title: "Atac la persoană", desc: "Ultima soluție: devine personal. E recunoașterea înfrângerii." },
+];
+
+const POWER_LAWS = [
+  { num: 1, title: "Nu eclipsa stăpânul", desc: "Fă-i pe cei de deasupra să arate mai bine. Nu-ți etala talentele excesiv." },
+  { num: 3, title: "Ascunde-ți intențiile", desc: "Nu-ți divulga planurile. Lasă lumea să ghicească." },
+  { num: 4, title: "Spune mai puțin", desc: "Cu cât vorbești mai mult, cu atât pari mai puțin impresionant. Tăcerea e putere." },
+  { num: 5, title: "Reputația", desc: "Apăr-o cu prețul vieții. Construită în ani, distrusă într-o zi." },
+  { num: 6, title: "Atrage atenția", desc: "Fii vizibil. Munca bună nevăzută e munca pierdută." },
+  { num: 11, title: "Fă-i să depindă de tine", desc: "Cu cât depind mai mult, cu atât ești mai liber." },
+  { num: 15, title: "Strivește dușmanul complet", desc: "Un dușman rănit dar viu devine mai periculos." },
+  { num: 16, title: "Folosește absența", desc: "Cine e mereu disponibil pierde valoarea." },
+  { num: 28, title: "Acționează cu îndrăzneală", desc: "Ezitarea e cea mai vizibilă slăbiciune." },
+  { num: 33, title: "Slăbiciunea fiecăruia", desc: "Toți au un punct slab. Cine îl știe, are pârghia." },
+  { num: 38, title: "Gândește rebel, comportă-te ca alții", desc: "Ideile rebele afișate atrag dușmani. Păstrează-le interior." },
+  { num: 48, title: "Asumă forma fără formă", desc: "Adaptează-te. Cei rigizi cad." },
+];
+
+const INFLUENCE = [
+  { num: 1, title: "Reciprocitate", desc: "Dă tu primul ceva. Oamenii simt nevoia să returneze." },
+  { num: 2, title: "Angajament și consistență", desc: "Cere mici acorduri întâi. Oamenii rămân consistenți cu ce-au spus." },
+  { num: 3, title: "Dovadă socială", desc: "Arată că alții (mulți, similari) fac deja ce vrei." },
+  { num: 4, title: "Autoritate", desc: "Demonstrează expertiză sau citează experți." },
+  { num: 5, title: "Simpatie", desc: "Suntem convinși de oameni care ne plac. Găsește puncte comune." },
+  { num: 6, title: "Raritate", desc: "Ce e rar e dorit. Dar trebuie să fie real, nu fabricat." },
+];
+
+const NEGOTIATION = [
+  { num: 1, title: "Mirroring", desc: "Repetă ultimele 1-3 cuvinte. El va explica mai mult, gratis." },
+  { num: 2, title: "Etichetare emoții", desc: "'Se pare că ești frustrat de...' Dezarmează tensiunea." },
+  { num: 3, title: "'Nu' e începutul", desc: "Când aud 'nu', oamenii se simt în control. De acolo începe negocierea." },
+  { num: 4, title: "Întrebări calibrate", desc: "Nu 'de ce?', ci 'cum?'. 'Cum aș putea face asta?'" },
+  { num: 5, title: "Așa e, exact", desc: "Nu căuta 'da'. Caută 'așa e'. Acolo e acordul real." },
+  { num: 6, title: "Acuzație audit", desc: "Spune tu primul ce-i mai rău. 'Știu că pare exagerat...'" },
+];
+
+const SUCCESS = [
+  { num: 1, title: "Definește bogăția concret", desc: "Templar: nu o cifră vagă. Câți €? Până când? Ce viață?" },
+  { num: 2, title: "Cheltuie mai puțin decât câștigi", desc: "Templar: regula absolută. Fără ea, niciun salariu nu ajunge." },
+  { num: 3, title: "Plătește-te pe tine întâi", desc: "Clason: în prima zi de salariu, pune deoparte. Apoi cheltui." },
+  { num: 4, title: "Datorie bună vs rea", desc: "Kiyosaki: pentru active = bună. Pentru pasive = rea." },
+  { num: 5, title: "Învață despre bani", desc: "Nu te învață nimeni. Apucă-te tu — cărți, podcasturi." },
+  { num: 6, title: "Surse multiple de venit", desc: "Un job = un punct de eșec. Diversifică." },
+  { num: 7, title: "Reinvestește profitul", desc: "Magia stă în compunere, nu în sumă." },
+  { num: 8, title: "Răbdarea bate inteligența", desc: "Cei bogați au rămas în joc cel mai mult." },
+  { num: 9, title: "Bogăția e ce nu vezi", desc: "Cei care arată bogați sunt rar bogați real." },
+  { num: 10, title: "Construiește abilități rare", desc: "Cu cât abilitatea ta e mai rară, cu atât ești plătit mai bine." },
+];
+
+const STOIC = [
+  { num: 1, title: "Dihotomia controlului", desc: "Epictet: depinde de mine / nu depinde de mine. Energie doar pe primul." },
+  { num: 2, title: "Memento mori", desc: "Aurelius: amintește-ți că vei muri. Clarificator, nu morbid." },
+  { num: 3, title: "Premeditatio malorum", desc: "Seneca: imaginează ce poate merge prost. Pregătit, nu mai surprinde." },
+  { num: 4, title: "Demistifică", desc: "Aurelius: vinul e suc fermentat. Hainele scumpe — lână vopsită." },
+  { num: 5, title: "Amor fati", desc: "Acceptă activ ce vine. Folosește orice îți dă viața." },
+  { num: 6, title: "Acționează, nu reacționa", desc: "Între stimul și răspuns e un spațiu. Acolo e libertatea." },
+  { num: 7, title: "Examenul de seară", desc: "Seneca: ce am făcut bine? ce am ratat? ce schimb mâine?" },
+  { num: 8, title: "Bucură-te de puțin", desc: "Seneca: cine nu se bucură de puțin nu se va bucura de mult." },
+  { num: 9, title: "Părerea altora", desc: "Nu poți controla ce gândesc alții. Doar ce faci tu." },
+  { num: 10, title: "Obstacolul e calea", desc: "Aurelius: ce te blochează devine drum. Frigul antrenează rezistența." },
+];
+
+const ALL_WISDOM = [
+  ...STRATAGEMS.map(x => ({...x, cat: 'stratagems', source: 'Schopenhauer'})),
+  ...POWER_LAWS.map(x => ({...x, cat: 'power', source: 'Robert Greene'})),
+  ...INFLUENCE.map(x => ({...x, cat: 'influence', source: 'Robert Cialdini'})),
+  ...NEGOTIATION.map(x => ({...x, cat: 'negotiation', source: 'Chris Voss'})),
+  ...TRACY_LAWS.map(x => ({...x, cat: 'success', source: 'Brian Tracy'})),
+  ...SUCCESS.map(x => ({...x, cat: 'wealth', source: 'Templar / Kiyosaki / Housel'})),
+  ...STOIC.map(x => ({...x, cat: 'stoic', source: 'Aurelius / Seneca / Epictet'})),
+];
+
+// ===== STORAGE =====
+
+async function saveData(key, value) {
+  try { await window.storage.set(key, JSON.stringify(value)); return true; }
+  catch (e) { return false; }
+}
+
+async function loadData(key, defaultValue) {
+  try {
+    const r = await window.storage.get(key);
+    return r ? JSON.parse(r.value) : defaultValue;
+  } catch (e) { return defaultValue; }
+}
+
+// ===== HELPERS =====
+
+function getToday() { return new Date().toISOString().split('T')[0]; }
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr || new Date());
+  const days = ['duminică','luni','marți','miercuri','joi','vineri','sâmbătă'];
+  const months = ['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'];
+  return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+function dayOfYear() {
+  return Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+}
+
+document.getElementById('todayDate').textContent = formatDate();
+document.getElementById('dayNum').textContent = `Z${String(dayOfYear()).padStart(3,'0')} · ${new Date().getFullYear()}`;
+
+// ===== TABS =====
+
+document.querySelectorAll('.tabbar button[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tabbar button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelector(`[data-panel="${tab}"]`).classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    if (typeof updateFabVisibility === 'function') updateFabVisibility();
+  });
+});
+
+// ===== MORNING =====
+
+function setDailyQuote() {
+  const allQuotes = getAllQuotes();
+  if (allQuotes.length === 0) {
+    document.getElementById('morningQuote').innerHTML = `Adaugă primul citat în secțiunea Citate.`;
+    return;
+  }
+  const q = allQuotes[dayOfYear() % allQuotes.length];
+  document.getElementById('morningQuote').innerHTML = `${q.text}<span class="author">${q.author || 'Necunoscut'}</span>`;
+}
+
+function setDailyLaw() {
+  const l = TRACY_LAWS[dayOfYear() % TRACY_LAWS.length];
+  document.getElementById('dailyLaw').innerHTML = `
+    <div class="b-title">${l.title}</div>
+    <div style="font-size: 14px; color: var(--ink-2); line-height: 1.55;">${l.desc}</div>
+    <div class="b-source">Lege ${l.num}/100 · Brian Tracy</div>
+  `;
+}
+
+async function loadMorning() {
+  const today = getToday();
+  const data = await loadData(`morning:${today}`, {});
+  document.getElementById('canControl').value = data.canControl || '';
+  document.getElementById('cannotControl').value = data.cannotControl || '';
+  document.getElementById('todayStep').value = data.todayStep || '';
+  document.getElementById('mainGoal').value = await loadData('mainGoal', '');
+}
+
+async function saveMorning() {
+  const today = getToday();
+  await saveData(`morning:${today}`, {
+    canControl: document.getElementById('canControl').value,
+    cannotControl: document.getElementById('cannotControl').value,
+    todayStep: document.getElementById('todayStep').value,
+    timestamp: Date.now()
+  });
+  await saveData('mainGoal', document.getElementById('mainGoal').value);
+  toast('Ritual salvat');
+  renderMorningHistory();
+}
+
+async function renderMorningHistory() {
+  try {
+    const result = await window.storage.list('morning:');
+    const keys = result ? result.keys : [];
+    if (!keys || keys.length === 0) {
+      document.getElementById('morningHistory').innerHTML = '<div class="empty">Niciun ritual salvat încă.</div>';
+      return;
+    }
+    const sortedKeys = keys.sort().reverse().slice(0, 14);
+    const entries = await Promise.all(sortedKeys.map(async k => {
+      const date = k.replace('morning:', '');
+      const data = await loadData(k, {});
+      return {date, ...data};
+    }));
+    const filtered = entries.filter(e => e.canControl || e.cannotControl || e.todayStep);
+    if (filtered.length === 0) {
+      document.getElementById('morningHistory').innerHTML = '<div class="empty">Niciun ritual complet încă.</div>';
+      return;
+    }
+    document.getElementById('morningHistory').innerHTML = filtered.map(e => {
+      const preview = [e.canControl, e.todayStep].filter(Boolean).join(' · ');
+      return `
+        <div class="ritual-item" onclick="this.classList.toggle('open')">
+          <div class="ritual-date mono">
+            <span>${formatDate(e.date)}</span>
+            <span style="color: var(--ink-4);">▾</span>
+          </div>
+          <div class="ritual-preview">${preview || 'Ritual salvat'}</div>
+          <div class="ritual-detail">
+            ${e.canControl ? `<div class="ritual-field"><div class="rf-label">Sub controlul meu</div><div class="rf-val">${e.canControl}</div></div>` : ''}
+            ${e.cannotControl ? `<div class="ritual-field"><div class="rf-label">De acceptat</div><div class="rf-val">${e.cannotControl}</div></div>` : ''}
+            ${e.todayStep ? `<div class="ritual-field"><div class="rf-label">Pasul zilei</div><div class="rf-val">${e.todayStep}</div></div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    document.getElementById('morningHistory').innerHTML = '<div class="empty">Niciun ritual încă.</div>';
+  }
+}
+
+// ===== HABITS =====
+
+let habits = [];
+
+async function loadHabits() {
+  habits = await loadData('habits', [
+    {id: 'h1', name: '30 min limba franceză', history: []},
+    {id: 'h2', name: 'Mișcare 20 min', history: []},
+    {id: 'h3', name: 'Citit 10 pagini', history: []},
+  ]);
+  renderHabits();
+}
+
+function renderHabits() {
+  const today = getToday();
+  const list = document.getElementById('habitsList');
+  
+  if (habits.length === 0) {
+    list.innerHTML = '<div class="empty">Niciun obicei. Începe cu unul mic.</div>';
+    updateHabitStats();
+    return;
+  }
+  
+  list.innerHTML = habits.map(h => {
+    const done = h.history.includes(today);
+    const streak = calculateStreak(h.history);
+    return `
+      <div class="habit-row">
+        <div class="habit-check ${done ? 'done' : ''}" onclick="toggleHabit('${h.id}')"></div>
+        <div class="habit-info">
+          <div class="habit-name">${h.name}</div>
+          <div class="habit-meta mono">
+            <span><span class="streak-num">${streak}</span> serie</span>
+            <span><span class="streak-num">${h.history.length}</span> total</span>
+          </div>
+        </div>
+        <button class="habit-del" onclick="deleteHabit('${h.id}')">×</button>
+      </div>
+    `;
+  }).join('');
+  
+  updateHabitStats();
+}
+
+function calculateStreak(history) {
+  if (history.length === 0) return 0;
+  const sorted = [...history].sort().reverse();
+  const today = getToday();
+  const yest = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  let streak = 0;
+  let check = sorted.includes(today) ? today : (sorted.includes(yest) ? yest : null);
+  if (!check) return 0;
+  while (sorted.includes(check)) {
+    streak++;
+    const prev = new Date(new Date(check).getTime() - 86400000);
+    check = prev.toISOString().split('T')[0];
+  }
+  return streak;
+}
+
+function updateHabitStats() {
+  const today = getToday();
+  document.getElementById('todayDone').textContent = habits.filter(h => h.history.includes(today)).length;
+  document.getElementById('longestStreak').textContent = Math.max(0, ...habits.map(h => calculateStreak(h.history)));
+  document.getElementById('totalCount').textContent = habits.reduce((s,h) => s + h.history.length, 0);
+}
+
+async function toggleHabit(id) {
+  const today = getToday();
+  const h = habits.find(x => x.id === id);
+  if (!h) return;
+  if (h.history.includes(today)) {
+    h.history = h.history.filter(d => d !== today);
+  } else {
+    h.history.push(today);
+  }
+  await saveData('habits', habits);
+  renderHabits();
+}
+
+async function addHabit() {
+  const name = document.getElementById('newHabitName').value.trim();
+  if (!name) return;
+  habits.push({id: 'h' + Date.now(), name, history: []});
+  await saveData('habits', habits);
+  document.getElementById('newHabitName').value = '';
+  renderHabits();
+  toast('Obicei adăugat');
+}
+
+async function deleteHabit(id) {
+  if (!confirm('Ștergi acest obicei?')) return;
+  habits = habits.filter(h => h.id !== id);
+  await saveData('habits', habits);
+  renderHabits();
+}
+
+// ===== FOCUS =====
+
+let timerInterval = null;
+let timerSeconds = 25 * 60;
+let timerTotal = 25 * 60;
+let timerRunning = false;
+
+function setTimer(min) {
+  if (timerRunning) return;
+  timerSeconds = min * 60;
+  timerTotal = min * 60;
+  document.querySelectorAll('.timer-presets button').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.min) === min);
+  });
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  document.getElementById('timerDisplay').textContent = 
+    `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  const circumference = 578;
+  const progress = (timerTotal - timerSeconds) / timerTotal;
+  document.getElementById('timerCircle').style.strokeDashoffset = circumference * (1 - progress);
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerStart').textContent = 'Start';
+  } else {
+    if (timerSeconds <= 0) timerSeconds = timerTotal;
+    timerRunning = true;
+    document.getElementById('timerStart').textContent = 'Pauză';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      updateTimerDisplay();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('timerStart').textContent = 'Start';
+        saveFocusSession();
+        toast('Sesiune încheiată ✓');
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = timerTotal;
+  document.getElementById('timerStart').textContent = 'Start';
+  updateTimerDisplay();
+}
+
+async function saveFocusSession() {
+  const task = document.getElementById('focusTask').value || 'Sesiune';
+  const today = getToday();
+  const sessions = await loadData(`focus:${today}`, []);
+  sessions.push({task, duration: Math.round(timerTotal/60), time: new Date().toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'})});
+  await saveData(`focus:${today}`, sessions);
+  renderFocusSessions();
+}
+
+async function renderFocusSessions() {
+  const today = getToday();
+  const sessions = await loadData(`focus:${today}`, []);
+  const div = document.getElementById('focusSessions');
+  if (sessions.length === 0) {
+    div.innerHTML = '<div class="empty">Nicio sesiune azi.</div>';
+    return;
+  }
+  div.innerHTML = sessions.map(s => `
+    <div class="m-row">
+      <span class="lbl">${s.task}</span>
+      <span class="val mono">${s.duration}m · ${s.time}</span>
+    </div>
+  `).join('');
+}
+
+// ===== MONEY =====
+
+async function loadMoney() {
+  const data = await loadData('money', {});
+  if (data.income) document.getElementById('income').value = data.income;
+  if (data.essentials) document.getElementById('essentials').value = data.essentials;
+  if (data.savePercent) document.getElementById('savePercent').value = data.savePercent;
+}
+
+async function calculateMoney() {
+  const income = parseFloat(document.getElementById('income').value) || 0;
+  const essentials = parseFloat(document.getElementById('essentials').value) || 0;
+  const savePercent = parseFloat(document.getElementById('savePercent').value) || 0;
+  
+  const savings = income * (savePercent / 100);
+  const free = income - essentials - savings;
+  
+  document.getElementById('rIncome').textContent = `${income.toLocaleString('ro-RO')} €`;
+  document.getElementById('rEssentials').textContent = `−${essentials.toLocaleString('ro-RO')} €`;
+  document.getElementById('rSavings').textContent = `+${savings.toLocaleString('ro-RO')} €`;
+  document.getElementById('rFree').textContent = `${free.toLocaleString('ro-RO')} €`;
+  document.getElementById('rFree').className = 'val mono' + (free < 0 ? ' neg' : '');
+  document.getElementById('savingsProgress').style.width = Math.min(100, savePercent) + '%';
+  document.getElementById('moneyResults').style.display = 'block';
+  
+  await saveData('money', {income, essentials, savePercent});
+}
+
+function calculateCompound() {
+  const monthly = parseFloat(document.getElementById('monthlyInvest').value) || 0;
+  const years = parseFloat(document.getElementById('years').value) || 0;
+  const rate = parseFloat(document.getElementById('rate').value) || 0;
+  
+  const months = years * 12;
+  const r = rate / 100 / 12;
+  let total = 0;
+  for (let i = 0; i < months; i++) total = (total + monthly) * (1 + r);
+  
+  const invested = monthly * months;
+  const gain = total - invested;
+  
+  document.getElementById('compoundResult').innerHTML = `
+    <div class="result">
+      <div class="r-label mono">Valoare la final · ${years} ani</div>
+      <div class="r-big mono">${Math.round(total).toLocaleString('ro-RO')} €</div>
+      <div class="r-small">
+        Pus deoparte: <b>${Math.round(invested).toLocaleString('ro-RO')} €</b><br>
+        Câștigat din dobândă: <b style="color: var(--ok);">${Math.round(gain).toLocaleString('ro-RO')} €</b>
+      </div>
+    </div>
+  `;
+}
+
+function evaluatePurchase() {
+  const item = document.getElementById('purchaseItem').value;
+  const price = parseFloat(document.getElementById('purchasePrice').value) || 0;
+  const gen = document.getElementById('generates').value;
+  
+  if (!item || !price || !gen) {
+    document.getElementById('purchaseResult').innerHTML = '<div class="result" style="color: var(--warn);">Completează toate câmpurile.</div>';
+    return;
+  }
+  
+  let verdict, advice, color;
+  if (gen === 'yes') {
+    verdict = 'ACTIV';
+    advice = 'Investiție bună dacă generează venit constant. Verifică: cât aduce vs cât te costă întreținerea?';
+    color = 'var(--ok)';
+  } else if (gen === 'maybe') {
+    verdict = 'NESIGUR';
+    advice = `Lucrurile care "poate" generează venit, de obicei nu o fac. Sigur poți justifica ${price.toLocaleString('ro-RO')} €?`;
+    color = 'var(--ink-3)';
+  } else {
+    verdict = 'PASIV';
+    advice = `${price.toLocaleString('ro-RO')} € pierduți din punct de vedere financiar. Banii investiți la 6% pe 10 ani: <b>${Math.round(price * Math.pow(1.06, 10)).toLocaleString('ro-RO')} €</b>.`;
+    color = 'var(--warn)';
+  }
+  
+  document.getElementById('purchaseResult').innerHTML = `
+    <div class="result" style="border-left: 3px solid ${color};">
+      <div class="r-label mono" style="color: ${color};">${verdict}</div>
+      <div class="r-small">${advice}</div>
+    </div>
+  `;
+}
+
+// ===== DECISIONS =====
+
+async function saveDecision() {
+  const title = document.getElementById('decisionTitle').value.trim();
+  if (!title) return;
+  const decision = {
+    id: Date.now(), title,
+    pro: document.getElementById('decisionPro').value,
+    con: document.getElementById('decisionCon').value,
+    wise: document.getElementById('decisionWise').value,
+    date: getToday(), timestamp: Date.now()
+  };
+  const decisions = await loadData('decisions', []);
+  decisions.unshift(decision);
+  await saveData('decisions', decisions.slice(0, 20));
+  ['decisionTitle','decisionPro','decisionCon','decisionWise'].forEach(id => document.getElementById(id).value = '');
+  renderDecisions();
+  toast('Decizie salvată. Recitește mâine.');
+}
+
+async function renderDecisions() {
+  const decisions = await loadData('decisions', []);
+  const div = document.getElementById('decisionsList');
+  if (decisions.length === 0) {
+    div.innerHTML = '<div class="empty">Nicio decizie încă.</div>';
+    return;
+  }
+  div.innerHTML = decisions.slice(0, 5).map(d => `
+    <div class="j-entry">
+      <div class="j-date mono">${formatDate(d.date)}</div>
+      <div class="j-line"><b>${d.title}</b></div>
+      ${d.pro ? `<div class="j-line" style="color: var(--ok);">+ ${d.pro}</div>` : ''}
+      ${d.con ? `<div class="j-line" style="color: var(--warn);">− ${d.con}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function reframe() {
+  const thought = document.getElementById('negThought').value.trim();
+  if (!thought) return;
+  let reframed = thought;
+  const reps = [
+    [/nu sunt bun la/gi, 'încă nu sunt bun la'],
+    [/nu pot/gi, 'încă nu pot'],
+    [/nu știu/gi, 'încă nu știu'],
+    [/nu reușesc/gi, 'încă nu reușesc'],
+    [/sunt prost/gi, 'încă învăț'],
+    [/e prea greu/gi, 'e greu pentru nivelul meu actual'],
+    [/niciodată nu/gi, 'până acum nu'],
+    [/întotdeauna/gi, 'deseori'],
+  ];
+  let changed = false;
+  for (const [from, to] of reps) {
+    if (from.test(reframed)) { reframed = reframed.replace(from, to); changed = true; }
+  }
+  if (!changed) reframed = thought + ' — încă. Care e pasul mic de azi?';
+  
+  document.getElementById('reframeResult').innerHTML = `
+    <div class="result">
+      <div class="r-label mono">Reformulat</div>
+      <div style="font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 10px;">${reframed}</div>
+      <div class="r-small">Cuvântul „încă" transformă o stare permanentă într-una temporară.</div>
+    </div>
+  `;
+}
+
+function transformObstacle() {
+  const obstacle = document.getElementById('obstacle').value.trim();
+  if (!obstacle) return;
+  document.getElementById('obstacleResult').innerHTML = `
+    <div class="result">
+      <div class="r-label mono">5 întrebări pentru transformare</div>
+      <div class="r-small" style="line-height: 1.7;">
+        <b>1.</b> Ce mă învață acest obstacol despre mine?<br>
+        <b>2.</b> Ce depinde de mine, ce nu?<br>
+        <b>3.</b> Dacă obstacolul ar deveni avantajul meu, cum?<br>
+        <b>4.</b> Ce ar face un mentor în locul tău?<br>
+        <b>5.</b> Care e cel mai mic pas în următoarele 10 minute?
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--ink-3); font-style: italic;">
+        „Obstacolul în calea acțiunii devine acțiunea." — Marcus Aurelius
+      </div>
+    </div>
+  `;
+}
+
+// ===== WISDOM =====
+
+let currentFilter = 'all';
+
+function renderWisdom() {
+  const search = document.getElementById('wisdomSearch').value.toLowerCase();
+  const list = document.getElementById('wisdomList');
+  const fab = document.getElementById('wisdomFab');
+  if (fab) fab.style.display = 'flex';
+  
+  let items = getAllWisdom();
+  if (currentFilter !== 'all') items = items.filter(i => i.cat === currentFilter);
+  if (search) items = items.filter(i => 
+    i.title.toLowerCase().includes(search) || 
+    i.desc.toLowerCase().includes(search) ||
+    (i.source || '').toLowerCase().includes(search)
+  );
+  
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty">Nimic găsit.</div>';
+    return;
+  }
+  
+  const catNames = {
+    stratagems: 'Stratagemă', power: 'Putere', influence: 'Influență',
+    negotiation: 'Negociere', success: 'Succes', wealth: 'Bani', stoic: 'Stoic',
+    custom: 'Al meu'
+  };
+  
+  list.innerHTML = items.map((item, idx) => `
+    <div class="w-item" onclick="if(!event.target.closest('button'))this.classList.toggle('open')">
+      <div class="w-meta">
+        <span class="w-num mono">№ ${String(idx + 1).padStart(2,'0')}</span>
+        <span class="w-tag mono">${catNames[item.cat] || item.cat}</span>
+      </div>
+      <div class="w-title">${item.title}</div>
+      <div class="w-body">
+        ${item.desc}
+        <div class="w-src">— ${item.source}</div>
+        <div class="w-actions">
+          <button onclick="event.stopPropagation();openEditWisdomModal('${item.id}')">Modifică</button>
+          <button class="del" onclick="event.stopPropagation();deleteWisdomItem('${item.id}')">Șterge</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterWisdom(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('#wisdomFilters button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderWisdom();
+}
+
+function searchWisdom() { renderWisdom(); }
+
+// ===== EVENING =====
+
+async function loadEvening() {
+  const today = getToday();
+  const data = await loadData(`evening:${today}`, {});
+  document.getElementById('eveningGood').value = data.good || '';
+  document.getElementById('eveningBad').value = data.bad || '';
+  document.getElementById('eveningChange').value = data.change || '';
+  document.getElementById('eveningGratitude').value = data.gratitude || '';
+  renderJournal();
+}
+
+async function saveEvening() {
+  const today = getToday();
+  await saveData(`evening:${today}`, {
+    good: document.getElementById('eveningGood').value,
+    bad: document.getElementById('eveningBad').value,
+    change: document.getElementById('eveningChange').value,
+    gratitude: document.getElementById('eveningGratitude').value,
+    timestamp: Date.now()
+  });
+  toast('Ziua e închisă. Somn bun.');
+  renderJournal();
+}
+
+async function renderJournal() {
+  try {
+    const result = await window.storage.list('evening:');
+    const keys = result ? result.keys : [];
+    if (!keys || keys.length === 0) {
+      document.getElementById('journalList').innerHTML = '<div class="empty">Niciun jurnal încă.</div>';
+      return;
+    }
+    const sortedKeys = keys.sort().reverse().slice(0, 7);
+    const entries = await Promise.all(sortedKeys.map(async k => {
+      const date = k.replace('evening:', '');
+      const data = await loadData(k, {});
+      return {date, ...data};
+    }));
+    const filtered = entries.filter(e => e.good || e.bad || e.change);
+    document.getElementById('journalList').innerHTML = filtered.length > 0 ? filtered.map(e => `
+      <div class="j-entry">
+        <div class="j-date mono">${formatDate(e.date)}</div>
+        ${e.good ? `<div class="j-line"><b>Bun:</b> ${e.good}</div>` : ''}
+        ${e.bad ? `<div class="j-line"><b>Ratat:</b> ${e.bad}</div>` : ''}
+        ${e.change ? `<div class="j-line"><b>Schimb:</b> ${e.change}</div>` : ''}
+      </div>
+    `).join('') : '<div class="empty">Niciun jurnal complet încă.</div>';
+  } catch (e) {
+    document.getElementById('journalList').innerHTML = '<div class="empty">Niciun jurnal încă.</div>';
+  }
+}
+
+// ===== TOAST =====
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+// ===== COVEY MATRIX =====
+
+let coveyTasks = {q1: [], q2: [], q3: [], q4: []};
+
+async function loadCovey() {
+  coveyTasks = await loadData('covey', {q1: [], q2: [], q3: [], q4: []});
+  renderCovey();
+}
+
+function renderCovey() {
+  ['q1','q2','q3','q4'].forEach(q => {
+    const list = document.getElementById(`tasks-${q}`);
+    const empty = document.getElementById(`empty-${q}`);
+    const tasks = coveyTasks[q] || [];
+    if (tasks.length === 0) {
+      list.innerHTML = '';
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      list.innerHTML = tasks.map((t, i) => `
+        <li>
+          <span class="x" onclick="removeCoveyTask('${q}', ${i})">×</span>
+          <span>${t}</span>
+        </li>
+      `).join('');
+    }
+  });
+}
+
+async function addCoveyTask(q) {
+  const input = document.getElementById(`input-${q}`);
+  const text = input.value.trim();
+  if (!text) return;
+  if (!coveyTasks[q]) coveyTasks[q] = [];
+  coveyTasks[q].push(text);
+  input.value = '';
+  await saveData('covey', coveyTasks);
+  renderCovey();
+}
+
+async function removeCoveyTask(q, idx) {
+  coveyTasks[q].splice(idx, 1);
+  await saveData('covey', coveyTasks);
+  renderCovey();
+}
+
+// ===== WISDOM EDITING =====
+
+let customWisdom = [];
+let deletedDefaults = []; // ids ale celor default șterse
+let editingId = null;
+
+async function loadCustomWisdom() {
+  customWisdom = await loadData('customWisdom', []);
+  deletedDefaults = await loadData('deletedDefaults', []);
+}
+
+function getAllWisdom() {
+  // ID-uri stabile pentru cele default: cat-num
+  const defaults = ALL_WISDOM.map(w => ({...w, id: `${w.cat}-${w.num}`, isDefault: true}))
+    .filter(w => !deletedDefaults.includes(w.id));
+  return [...defaults, ...customWisdom];
+}
+
+function openAddWisdomModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Adaugă principiu nou';
+  document.getElementById('modalSub').textContent = 'Construiește-ți propria bibliotecă';
+  document.getElementById('modalWTitle').value = '';
+  document.getElementById('modalWCat').value = 'custom';
+  document.getElementById('modalWDesc').value = '';
+  document.getElementById('modalWSrc').value = '';
+  document.getElementById('wisdomModal').classList.add('show');
+}
+
+function openEditWisdomModal(id) {
+  const all = getAllWisdom();
+  const item = all.find(w => w.id === id);
+  if (!item) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Modifică principiu';
+  document.getElementById('modalSub').textContent = item.isDefault ? 'Modificarea va salva o copie personalizată' : 'Editează intrarea ta';
+  document.getElementById('modalWTitle').value = item.title;
+  document.getElementById('modalWCat').value = item.cat;
+  document.getElementById('modalWDesc').value = item.desc;
+  document.getElementById('modalWSrc').value = item.source || '';
+  document.getElementById('wisdomModal').classList.add('show');
+}
+
+function closeWisdomModal() {
+  document.getElementById('wisdomModal').classList.remove('show');
+  editingId = null;
+}
+
+async function saveWisdomItem() {
+  const title = document.getElementById('modalWTitle').value.trim();
+  const cat = document.getElementById('modalWCat').value;
+  const desc = document.getElementById('modalWDesc').value.trim();
+  const source = document.getElementById('modalWSrc').value.trim() || 'Adăugat de mine';
+  
+  if (!title || !desc) {
+    toast('Completează titlul și descrierea');
+    return;
+  }
+  
+  if (editingId) {
+    // Editare
+    const existingIdx = customWisdom.findIndex(w => w.id === editingId);
+    if (existingIdx >= 0) {
+      // Custom existent — actualizare
+      customWisdom[existingIdx] = {...customWisdom[existingIdx], title, cat, desc, source};
+    } else {
+      // Default — îl marcăm ca șters și salvăm versiunea editată ca custom
+      if (!deletedDefaults.includes(editingId)) {
+        deletedDefaults.push(editingId);
+        await saveData('deletedDefaults', deletedDefaults);
+      }
+      const newId = 'custom-' + Date.now();
+      const all = getAllWisdom();
+      const orig = all.find(w => w.id === editingId);
+      customWisdom.push({
+        id: newId,
+        num: orig ? orig.num : (customWisdom.length + 1),
+        title, cat, desc, source,
+        isDefault: false
+      });
+    }
+  } else {
+    // Adăugare nouă
+    customWisdom.push({
+      id: 'custom-' + Date.now(),
+      num: customWisdom.filter(w => w.cat === cat).length + 100,
+      title, cat, desc, source,
+      isDefault: false
+    });
+  }
+  
+  await saveData('customWisdom', customWisdom);
+  closeWisdomModal();
+  renderWisdom();
+  toast(editingId ? 'Modificat ✓' : 'Adăugat ✓');
+}
+
+async function deleteWisdomItem(id) {
+  if (!confirm('Ștergi acest principiu?')) return;
+  const existingIdx = customWisdom.findIndex(w => w.id === id);
+  if (existingIdx >= 0) {
+    customWisdom.splice(existingIdx, 1);
+    await saveData('customWisdom', customWisdom);
+  } else {
+    // Default — marchează ca șters
+    if (!deletedDefaults.includes(id)) {
+      deletedDefaults.push(id);
+      await saveData('deletedDefaults', deletedDefaults);
+    }
+  }
+  renderWisdom();
+  toast('Șters');
+}
+
+// ===== QUOTES MANAGEMENT =====
+
+let customQuotes = []; // citate adăugate de utilizator
+let deletedDefaultQuotes = []; // indici ai citatelor default șterse
+let editingQuoteId = null;
+
+async function loadQuotes() {
+  customQuotes = await loadData('customQuotes', []);
+  deletedDefaultQuotes = await loadData('deletedDefaultQuotes', []);
+}
+
+function getAllQuotes() {
+  // Default-uri primesc id de forma "d-<index>"
+  const defaults = QUOTES.map((q, i) => ({...q, id: `d-${i}`, isDefault: true}))
+    .filter(q => !deletedDefaultQuotes.includes(q.id));
+  return [...defaults, ...customQuotes];
+}
+
+function renderQuotes() {
+  const search = (document.getElementById('quotesSearch')?.value || '').toLowerCase();
+  const list = document.getElementById('quotesList');
+  if (!list) return;
+  
+  let items = getAllQuotes();
+  if (search) {
+    items = items.filter(q => 
+      q.text.toLowerCase().includes(search) || 
+      (q.author || '').toLowerCase().includes(search)
+    );
+  }
+  
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty">Niciun citat. Apasă pe + să adaugi unul.</div>';
+    return;
+  }
+  
+  list.innerHTML = items.map((q, idx) => `
+    <div class="w-item" onclick="if(!event.target.closest('button'))this.classList.toggle('open')">
+      <div class="w-meta">
+        <span class="w-num mono">№ ${String(idx + 1).padStart(2,'0')}</span>
+        <span class="w-tag mono">${q.isDefault ? 'Default' : 'Al meu'}</span>
+      </div>
+      <div class="w-title" style="font-weight: 500; font-style: italic; line-height: 1.4;">„${q.text}"</div>
+      <div class="w-body">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em;">— ${q.author || 'Necunoscut'}</div>
+        <div class="w-actions">
+          <button onclick="event.stopPropagation();openEditQuoteModal('${q.id}')">Modifică</button>
+          <button class="del" onclick="event.stopPropagation();deleteQuoteItem('${q.id}')">Șterge</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAddQuoteModal() {
+  editingQuoteId = null;
+  document.getElementById('quoteModalTitle').textContent = 'Adaugă citat nou';
+  document.getElementById('quoteModalSub').textContent = 'Adaugă unul care îți vorbește';
+  document.getElementById('modalQText').value = '';
+  document.getElementById('modalQAuthor').value = '';
+  document.getElementById('quoteModal').classList.add('show');
+}
+
+function openEditQuoteModal(id) {
+  const all = getAllQuotes();
+  const item = all.find(q => q.id === id);
+  if (!item) return;
+  editingQuoteId = id;
+  document.getElementById('quoteModalTitle').textContent = 'Modifică citat';
+  document.getElementById('quoteModalSub').textContent = item.isDefault ? 'Va salva o copie personalizată' : 'Editează citatul tău';
+  document.getElementById('modalQText').value = item.text;
+  document.getElementById('modalQAuthor').value = item.author || '';
+  document.getElementById('quoteModal').classList.add('show');
+}
+
+function closeQuoteModal() {
+  document.getElementById('quoteModal').classList.remove('show');
+  editingQuoteId = null;
+}
+
+async function saveQuoteItem() {
+  const text = document.getElementById('modalQText').value.trim();
+  const author = document.getElementById('modalQAuthor').value.trim();
+  
+  if (!text) {
+    toast('Scrie textul citatului');
+    return;
+  }
+  
+  if (editingQuoteId) {
+    const existingIdx = customQuotes.findIndex(q => q.id === editingQuoteId);
+    if (existingIdx >= 0) {
+      customQuotes[existingIdx] = {...customQuotes[existingIdx], text, author};
+    } else {
+      // Default — marchează ca șters, salvează versiunea personalizată
+      if (!deletedDefaultQuotes.includes(editingQuoteId)) {
+        deletedDefaultQuotes.push(editingQuoteId);
+        await saveData('deletedDefaultQuotes', deletedDefaultQuotes);
+      }
+      customQuotes.push({
+        id: 'cq-' + Date.now(),
+        text, author,
+        isDefault: false
+      });
+    }
+  } else {
+    customQuotes.push({
+      id: 'cq-' + Date.now(),
+      text, author,
+      isDefault: false
+    });
+  }
+  
+  await saveData('customQuotes', customQuotes);
+  closeQuoteModal();
+  renderQuotes();
+  setDailyQuote(); // re-actualizează citatul de dimineață în caz că lista s-a schimbat
+  toast(editingQuoteId ? 'Modificat ✓' : 'Adăugat ✓');
+}
+
+async function deleteQuoteItem(id) {
+  if (!confirm('Ștergi acest citat?')) return;
+  const existingIdx = customQuotes.findIndex(q => q.id === id);
+  if (existingIdx >= 0) {
+    customQuotes.splice(existingIdx, 1);
+    await saveData('customQuotes', customQuotes);
+  } else {
+    if (!deletedDefaultQuotes.includes(id)) {
+      deletedDefaultQuotes.push(id);
+      await saveData('deletedDefaultQuotes', deletedDefaultQuotes);
+    }
+  }
+  renderQuotes();
+  setDailyQuote();
+  toast('Șters');
+}
+
+// ===== LIFE - MEMENTO MORI =====
+
+async function loadLifeData() {
+  const data = await loadData('lifeData', null);
+  if (data && data.birthDate) {
+    document.getElementById('birthDate').value = data.birthDate;
+    document.getElementById('lifeExpectancy').value = data.lifeExpectancy || 80;
+    document.getElementById('lifeSetup').style.display = 'none';
+    document.getElementById('lifeView').style.display = 'block';
+    renderLifeView(data);
+  } else {
+    document.getElementById('lifeSetup').style.display = 'block';
+    document.getElementById('lifeView').style.display = 'none';
+  }
+}
+
+async function saveLifeData() {
+  const birthDate = document.getElementById('birthDate').value;
+  const lifeExpectancyRaw = document.getElementById('lifeExpectancy').value;
+  const lifeExpectancy = parseInt(lifeExpectancyRaw) || 80;
+  
+  if (!birthDate) {
+    toast('Setează data nașterii');
+    return;
+  }
+  
+  // Validare: data nașterii să fie în trecut
+  const birth = new Date(birthDate);
+  const now = new Date();
+  if (birth >= now) {
+    toast('Data nașterii trebuie să fie în trecut');
+    return;
+  }
+  
+  const data = {birthDate, lifeExpectancy};
+  const ok = await saveData('lifeData', data);
+  
+  if (!ok) {
+    toast('Eroare la salvare. Încearcă din nou.');
+    return;
+  }
+  
+  // Verific că s-a salvat citind înapoi
+  const verify = await loadData('lifeData', null);
+  if (!verify || !verify.birthDate) {
+    toast('Salvarea nu a reușit. Verifică setările browserului.');
+    return;
+  }
+  
+  document.getElementById('lifeSetup').style.display = 'none';
+  document.getElementById('lifeView').style.display = 'block';
+  renderLifeView(data);
+  toast('Salvat ✓');
+}
+
+async function resetLifeData() {
+  if (!confirm('Resetezi datele vieții?')) return;
+  await window.storage.delete('lifeData');
+  document.getElementById('lifeSetup').style.display = 'block';
+  document.getElementById('lifeView').style.display = 'none';
+  document.getElementById('birthDate').value = '';
+}
+
+function renderLifeView(data) {
+  const birth = new Date(data.birthDate);
+  const now = new Date();
+  const death = new Date(birth);
+  death.setFullYear(birth.getFullYear() + data.lifeExpectancy);
+  
+  const msInDay = 1000 * 60 * 60 * 24;
+  const msInWeek = msInDay * 7;
+  const msInYear = msInDay * 365.25;
+  
+  // Calcule de bază
+  const daysLived = Math.floor((now - birth) / msInDay);
+  const totalDays = Math.floor((death - birth) / msInDay);
+  const daysRemaining = Math.max(0, totalDays - daysLived);
+  
+  const yearsLived = (daysLived / 365.25);
+  const yearsRemaining = (daysRemaining / 365.25);
+  
+  const weeksLived = Math.floor((now - birth) / msInWeek);
+  const totalWeeks = Math.floor((death - birth) / msInWeek);
+  
+  const percent = Math.min(100, (daysLived / totalDays * 100));
+  
+  // Afișare stats
+  document.getElementById('ageDisplay').textContent = Math.floor(yearsLived);
+  document.getElementById('ageDays').textContent = `${daysLived.toLocaleString('ro-RO')} zile`;
+  
+  document.getElementById('yearsLeft').textContent = Math.floor(yearsRemaining);
+  document.getElementById('daysLeft').textContent = `${daysRemaining.toLocaleString('ro-RO')} zile`;
+  
+  document.getElementById('percentLived').textContent = percent.toFixed(1) + '%';
+  document.getElementById('lifeProgress').style.width = percent + '%';
+  
+  let note = '';
+  if (percent < 25) note = 'Ești la început. Folosește bine.';
+  else if (percent < 50) note = 'Prima jumătate. Construiește.';
+  else if (percent < 75) note = 'A doua jumătate. Aici contează.';
+  else note = 'Ultimii ani. Bucură-te.';
+  document.getElementById('progressNote').textContent = note;
+  
+  // Concret
+  const summersLeft = Math.floor(yearsRemaining);
+  document.getElementById('summersLeft').textContent = summersLeft;
+  document.getElementById('christmasLeft').textContent = summersLeft;
+  document.getElementById('weekendsLeft').textContent = Math.floor(daysRemaining / 7).toLocaleString('ro-RO');
+  
+  const age = yearsLived;
+  const workYearsLeft = Math.max(0, Math.floor(65 - age));
+  document.getElementById('workYearsLeft').textContent = workYearsLeft;
+  
+  document.getElementById('hoursLeft').textContent = (daysRemaining * 24).toLocaleString('ro-RO');
+  
+  document.getElementById('reflectYears').textContent = Math.floor(yearsRemaining);
+  
+  // Grila de săptămâni
+  renderWeeksGrid(weeksLived, totalWeeks);
+  document.getElementById('weeksGridInfo').textContent = `${weeksLived} / ${totalWeeks} săpt.`;
+}
+
+function renderWeeksGrid(lived, total) {
+  const grid = document.getElementById('weeksGrid');
+  // 52 săptămâni pe an, deci grid-ul are 52 coloane și totalWeeks/52 rânduri (~80 ani × 52)
+  let html = '';
+  for (let i = 0; i < total; i++) {
+    let cls = 'week-cell';
+    if (i < lived) cls += ' past';
+    else if (i === lived) cls += ' current';
+    html += `<div class="${cls}"></div>`;
+  }
+  grid.innerHTML = html;
+}
+
+// ===== ALTER EGO =====
+
+let alterEgos = [];
+let currentAlterId = null;
+let editingAlter = false;
+
+async function loadAlterEgos() {
+  alterEgos = await loadData('alterEgos', []);
+  renderAlterList();
+}
+
+function renderAlterList() {
+  const container = document.getElementById('alterCards');
+  if (alterEgos.length === 0) {
+    container.innerHTML = `
+      <div class="block" style="text-align: center; padding: 28px 20px;">
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--ink); margin-bottom: 6px;">Niciun alter ego încă</div>
+        <div style="font-size: 13px; color: var(--ink-3); line-height: 1.5;">Construiește primul. Începe cu unul singur — pentru contextul care contează cel mai mult.</div>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = alterEgos.map((a, i) => `
+    <div class="alter-card" onclick="openAlterDetail('${a.id}')">
+      <div class="ac-label mono">№ ${String(i + 1).padStart(2,'0')} · ${a.context || 'Fără context'}</div>
+      <div class="ac-name">${a.name || 'Fără nume'}</div>
+      ${a.traits ? `<div class="ac-section">
+        <div class="ac-section-label mono">Calități</div>
+        <div class="ac-section-content">${a.traits}</div>
+      </div>` : ''}
+      ${a.mantra ? `<div class="ac-mantra">„${a.mantra}"</div>` : ''}
+      <div class="alter-actions">
+        <button class="primary" onclick="event.stopPropagation();activateAlter('${a.id}')">⚡ Activează</button>
+        <button onclick="event.stopPropagation();openAlterDetail('${a.id}')">Detalii</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function startAlterWizard() {
+  editingAlter = false;
+  currentAlterId = null;
+  // Resetează câmpurile
+  ['alterContext','alterName','alterTraits','alterModel','alterTotem','alterMantra','alterNot'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('alterListView').style.display = 'none';
+  document.getElementById('alterWizardView').style.display = 'block';
+  document.getElementById('alterDetailView').style.display = 'none';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function cancelAlterWizard() {
+  document.getElementById('alterWizardView').style.display = 'none';
+  document.getElementById('alterListView').style.display = 'block';
+}
+
+async function saveAlterEgo() {
+  const data = {
+    id: editingAlter && currentAlterId ? currentAlterId : 'alter-' + Date.now(),
+    context: document.getElementById('alterContext').value.trim(),
+    name: document.getElementById('alterName').value.trim(),
+    traits: document.getElementById('alterTraits').value.trim(),
+    model: document.getElementById('alterModel').value.trim(),
+    totem: document.getElementById('alterTotem').value.trim(),
+    mantra: document.getElementById('alterMantra').value.trim(),
+    notIs: document.getElementById('alterNot').value.trim(),
+    activations: editingAlter ? (alterEgos.find(a => a.id === currentAlterId)?.activations || 0) : 0,
+    createdAt: editingAlter ? (alterEgos.find(a => a.id === currentAlterId)?.createdAt || Date.now()) : Date.now()
+  };
+  
+  if (!data.name) {
+    toast('Dă-i un nume');
+    return;
+  }
+  
+  if (editingAlter && currentAlterId) {
+    const idx = alterEgos.findIndex(a => a.id === currentAlterId);
+    if (idx >= 0) alterEgos[idx] = data;
+  } else {
+    alterEgos.push(data);
+  }
+  
+  await saveData('alterEgos', alterEgos);
+  document.getElementById('alterWizardView').style.display = 'none';
+  document.getElementById('alterListView').style.display = 'block';
+  renderAlterList();
+  toast(editingAlter ? 'Modificat ✓' : 'Alter ego creat ✓');
+  editingAlter = false;
+  currentAlterId = null;
+}
+
+function openAlterDetail(id) {
+  const alter = alterEgos.find(a => a.id === id);
+  if (!alter) return;
+  currentAlterId = id;
+  
+  document.getElementById('alterDetailContent').innerHTML = `
+    <div class="alter-card" style="margin-bottom: 0;">
+      <div class="ac-label mono">${alter.context || 'Fără context specific'}</div>
+      <div class="ac-name">${alter.name}</div>
+      
+      ${alter.traits ? `<div class="ac-section">
+        <div class="ac-section-label mono">Cum este</div>
+        <div class="ac-section-content">${alter.traits}</div>
+      </div>` : ''}
+      
+      ${alter.model ? `<div class="ac-section">
+        <div class="ac-section-label mono">Inspirat din</div>
+        <div class="ac-section-content">${alter.model}</div>
+      </div>` : ''}
+      
+      ${alter.totem ? `<div class="ac-section">
+        <div class="ac-section-label mono">Totem / Activare</div>
+        <div class="ac-section-content">${alter.totem}</div>
+      </div>` : ''}
+      
+      ${alter.notIs ? `<div class="ac-section">
+        <div class="ac-section-label mono">Ce NU este</div>
+        <div class="ac-section-content">${alter.notIs}</div>
+      </div>` : ''}
+      
+      ${alter.mantra ? `<div class="ac-mantra">„${alter.mantra}"</div>` : ''}
+      
+      <div class="alter-actions">
+        <button class="primary" onclick="activateAlter('${alter.id}')">⚡ Activează acum</button>
+      </div>
+    </div>
+    
+    <div class="block" style="margin-top: 14px;">
+      <div class="b-label"><span class="dot"></span>Statistici</div>
+      <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+        <span style="color: var(--ink-3); font-size: 13px;">Activări totale</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600;">${alter.activations || 0}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+        <span style="color: var(--ink-3); font-size: 13px;">Creat</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">${new Date(alter.createdAt).toLocaleDateString('ro-RO')}</span>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('alterListView').style.display = 'none';
+  document.getElementById('alterWizardView').style.display = 'none';
+  document.getElementById('alterDetailView').style.display = 'block';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function backToAlterList() {
+  document.getElementById('alterDetailView').style.display = 'none';
+  document.getElementById('alterListView').style.display = 'block';
+  currentAlterId = null;
+}
+
+function editAlterEgo() {
+  if (!currentAlterId) return;
+  const alter = alterEgos.find(a => a.id === currentAlterId);
+  if (!alter) return;
+  
+  editingAlter = true;
+  document.getElementById('alterContext').value = alter.context || '';
+  document.getElementById('alterName').value = alter.name || '';
+  document.getElementById('alterTraits').value = alter.traits || '';
+  document.getElementById('alterModel').value = alter.model || '';
+  document.getElementById('alterTotem').value = alter.totem || '';
+  document.getElementById('alterMantra').value = alter.mantra || '';
+  document.getElementById('alterNot').value = alter.notIs || '';
+  
+  document.getElementById('alterDetailView').style.display = 'none';
+  document.getElementById('alterWizardView').style.display = 'block';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+async function deleteAlterEgo() {
+  if (!currentAlterId) return;
+  if (!confirm('Ștergi acest alter ego?')) return;
+  alterEgos = alterEgos.filter(a => a.id !== currentAlterId);
+  await saveData('alterEgos', alterEgos);
+  backToAlterList();
+  renderAlterList();
+  toast('Șters');
+}
+
+async function activateAlter(id) {
+  const alter = alterEgos.find(a => a.id === id);
+  if (!alter) return;
+  
+  // Incrementează contorul
+  alter.activations = (alter.activations || 0) + 1;
+  await saveData('alterEgos', alterEgos);
+  
+  // Afișează modalul de activare
+  document.getElementById('activationName').textContent = alter.name;
+  document.getElementById('activationMantra').textContent = alter.mantra ? `„${alter.mantra}"` : 'Ești pregătit.';
+  document.getElementById('activationModal').classList.add('show');
+}
+
+function closeActivation() {
+  document.getElementById('activationModal').classList.remove('show');
+  // Reîmprospătează lista dacă ești pe ea
+  renderAlterList();
+  if (currentAlterId) openAlterDetail(currentAlterId);
+}
+
+// ===== SETTINGS - EXPORT / IMPORT =====
+
+// Lista cheilor cunoscute + cele cu prefix (morning:, evening:, focus:)
+const STATIC_KEYS = [
+  'mainGoal', 'habits', 'money', 'decisions', 'covey',
+  'customWisdom', 'deletedDefaults', 'customQuotes', 'deletedDefaultQuotes',
+  'lifeData', 'alterEgos'
+];
+
+async function gatherAllData() {
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    data: {}
+  };
+  
+  // Cheile statice
+  for (const key of STATIC_KEYS) {
+    try {
+      const r = await window.storage.get(key);
+      if (r) data.data[key] = r.value;
+    } catch (e) { /* skip */ }
+  }
+  
+  // Cheile cu prefix
+  const prefixes = ['morning:', 'evening:', 'focus:'];
+  for (const prefix of prefixes) {
+    try {
+      const result = await window.storage.list(prefix);
+      const keys = result ? result.keys : [];
+      for (const k of keys) {
+        try {
+          const r = await window.storage.get(k);
+          if (r) data.data[k] = r.value;
+        } catch (e) { /* skip */ }
+      }
+    } catch (e) { /* skip */ }
+  }
+  
+  return data;
+}
+
+async function exportAllData() {
+  toast('Pregătesc backup-ul...');
+  try {
+    const data = await gatherAllData();
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    
+    const date = new Date().toISOString().split('T')[0];
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `codex-backup-${date}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    const count = Object.keys(data.data).length;
+    toast(`Backup descărcat (${count} intrări) ✓`);
+  } catch (e) {
+    toast('Eroare la export');
+    console.error(e);
+  }
+}
+
+async function importAllData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const ok = confirm('Atenție: importul va înlocui toate datele actuale.\n\nÎți recomand să faci întâi un backup curent.\n\nContinui?');
+  if (!ok) {
+    event.target.value = '';
+    return;
+  }
+  
+  try {
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+    
+    if (!parsed || !parsed.data || typeof parsed.data !== 'object') {
+      toast('Fișier invalid');
+      event.target.value = '';
+      return;
+    }
+    
+    let imported = 0;
+    let failed = 0;
+    
+    for (const [key, value] of Object.entries(parsed.data)) {
+      try {
+        await window.storage.set(key, value);
+        imported++;
+      } catch (e) {
+        failed++;
+      }
+    }
+    
+    toast(`Importat ${imported} intrări ✓`);
+    setTimeout(() => location.reload(), 1500);
+  } catch (e) {
+    toast('Eroare la citirea fișierului');
+    console.error(e);
+  }
+  
+  event.target.value = '';
+}
+
+async function resetAllData() {
+  const ok1 = confirm('Sigur vrei să ștergi TOATE datele?\n\nObiceiuri, citate, decizii, jurnal, bani — totul.\n\nFă întâi un backup!');
+  if (!ok1) return;
+  const ok2 = confirm('Ești absolut sigur? Nu se poate anula.');
+  if (!ok2) return;
+  
+  try {
+    // Șterge cheile statice
+    for (const key of STATIC_KEYS) {
+      try { await window.storage.delete(key); } catch (e) {}
+    }
+    
+    // Șterge cele cu prefix
+    const prefixes = ['morning:', 'evening:', 'focus:'];
+    for (const prefix of prefixes) {
+      try {
+        const result = await window.storage.list(prefix);
+        const keys = result ? result.keys : [];
+        for (const k of keys) {
+          try { await window.storage.delete(k); } catch (e) {}
+        }
+      } catch (e) {}
+    }
+    
+    toast('Totul șters. Se reîncarcă...');
+    setTimeout(() => location.reload(), 1500);
+  } catch (e) {
+    toast('Eroare la ștergere');
+  }
+}
+
+async function renderDataStats() {
+  try {
+    const data = await gatherAllData();
+    const keys = Object.keys(data.data);
+    
+    const morningCount = keys.filter(k => k.startsWith('morning:')).length;
+    const eveningCount = keys.filter(k => k.startsWith('evening:')).length;
+    const focusCount = keys.filter(k => k.startsWith('focus:')).length;
+    
+    const habits = JSON.parse(data.data.habits || '[]');
+    const decisions = JSON.parse(data.data.decisions || '[]');
+    const customWisdom = JSON.parse(data.data.customWisdom || '[]');
+    const customQuotes = JSON.parse(data.data.customQuotes || '[]');
+    
+    const totalSize = JSON.stringify(data).length;
+    const sizeKB = (totalSize / 1024).toFixed(1);
+    
+    document.getElementById('dataStats').innerHTML = `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div><strong>${morningCount}</strong> ritualuri dim.</div>
+        <div><strong>${eveningCount}</strong> jurnale seara</div>
+        <div><strong>${habits.length}</strong> obiceiuri</div>
+        <div><strong>${focusCount}</strong> zile cu sesiuni</div>
+        <div><strong>${decisions.length}</strong> decizii</div>
+        <div><strong>${customWisdom.length}</strong> principii ale tale</div>
+        <div><strong>${customQuotes.length}</strong> citate ale tale</div>
+        <div><strong>${sizeKB} KB</strong> total</div>
+      </div>
+    `;
+  } catch (e) {
+    document.getElementById('dataStats').innerHTML = '<div style="color: var(--ink-4);">Nu s-au putut încărca statisticile.</div>';
+  }
+}
+
+function openMoreMenu() {
+  document.getElementById('moreMenuBg').classList.add('show');
+}
+
+function closeMoreMenu() {
+  document.getElementById('moreMenuBg').classList.remove('show');
+}
+
+function goToTab(tab) {
+  closeMoreMenu();
+  // Deselectează tab-urile principale
+  document.querySelectorAll('.tabbar button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  // Activează panoul
+  const panel = document.querySelector(`[data-panel="${tab}"]`);
+  if (panel) panel.classList.add('active');
+  // Marchez "Mai mult" ca activ (pentru a arăta că ești într-un sub-panou)
+  document.getElementById('moreBtn').classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  
+  // Operații specifice
+  if (tab === 'settings') renderDataStats();
+  updateFabVisibility();
+}
+
+// ===== INIT =====
+
+async function init() {
+  await loadQuotes();
+  setDailyQuote();
+  setDailyLaw();
+  await loadMorning();
+  await renderMorningHistory();
+  await loadHabits();
+  await loadMoney();
+  await renderFocusSessions();
+  await renderDecisions();
+  await loadEvening();
+  await loadCovey();
+  await loadCustomWisdom();
+  await loadLifeData();
+  await loadAlterEgos();
+  renderWisdom();
+  renderQuotes();
+  updateTimerDisplay();
+  updateFabVisibility();
+}
+
+function updateFabVisibility() {
+  // Verifică ce panou e activ (poate fi unul principal sau unul din meniul Mai mult)
+  const activePanel = document.querySelector('.panel.active');
+  const activeTab = activePanel ? activePanel.dataset.panel : 'morning';
+  document.getElementById('wisdomFab').style.display = activeTab === 'wisdom' ? 'flex' : 'none';
+  const qFab = document.getElementById('quotesFab');
+  if (qFab) qFab.style.display = activeTab === 'quotes' ? 'flex' : 'none';
+}
+
+init();
+</script>
+
+</body>
+</html>
